@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TicketStatus {
+  WAITING
+  CALLED
+  SERVING
+  COMPLETED
+  CANCELLED
+  MISSED
+}
+
+enum DeskStatus {
+  OPEN
+  PAUSED
+  CLOSED
+}
+
+model Service {
+  id         String   @id @default(uuid())
+  name       String
+  prefix     String   @unique
+  avgMinutes Float
+  active     Boolean  @default(true)
+  nextNumber Int      @default(0)
+  desks      Desk[]
+  tickets    Ticket[]
+}
+
+model Desk {
+  id         String     @id @default(uuid())
+  name       String
+  buildingId String
+  floor      Int
+  locationId String
+  status     DeskStatus @default(CLOSED)
+  services   Service[]
+  tickets    Ticket[]
+}
+
+model Ticket {
+  id        String       @id @default(uuid())
+  number    String       @unique
+  sequence  Int
+  serviceId String
+  service   Service      @relation(fields: [serviceId], references: [id])
+  status    TicketStatus @default(WAITING)
+  profile   String       @default("standard")
+  tokenHash String
+  deskId    String?
+  desk      Desk?        @relation(fields: [deskId], references: [id])
+  createdAt DateTime     @default(now())
+  calledAt  DateTime?
+  startedAt DateTime?
+  endedAt   DateTime?
+
+  @@unique([serviceId, sequence])
+  @@index([serviceId, status, sequence])
+  @@index([deskId, status])
+}
