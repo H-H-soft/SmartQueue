@@ -1,0 +1,48 @@
+{
+  "id": "test-building",
+  "name": "Clădire de test (Primărie)",
+  "floors": [
+    { "id": "f0", "level": 0, "name": "Parter", "plan": "/plans/f0.svg", "width": 600, "height": 400 },
+    { "id": "f1", "level": 1, "name": "Etaj 1", "plan": "/plans/f1.svg", "width": 600, "height": 400 }
+  ],
+  "nodes": [
+    { "id": "n1",  "floor": "f0", "type": "entrance",     "x": 40,  "y": 200, "label": "Intrare principală" },
+    { "id": "n2",  "floor": "f0", "type": "junction",     "x": 200, "y": 200 },
+    { "id": "n3",  "floor": "f0", "type": "elevator",     "x": 300, "y": 120, "label": "Lift A" },
+    { "id": "n4",  "floor": "f0", "type": "stairs",       "x": 300, "y": 290, "label": "Scări A" },
+    { "id": "n5",  "floor": "f0", "type": "desk",         "x": 400, "y": 200, "label": "Ghișeu 1 – Informații", "deskId": "d1" },
+    { "id": "n6",  "floor": "f0", "type": "restroom_accessible", "x": 200, "y": 330, "label": "Toaletă accesibilă" },
+    { "id": "n7",  "floor": "f1", "type": "elevator",     "x": 300, "y": 120, "label": "Lift A" },
+    { "id": "n8",  "floor": "f1", "type": "stairs",       "x": 300, "y": 290, "label": "Scări A" },
+    { "id": "n9",  "floor": "f1", "type": "junction",     "x": 420, "y": 120 },
+    { "id": "n10", "floor": "f1", "type": "desk",         "x": 520, "y": 120, "label": "Ghișeu 3 – Taxe și impozite", "deskId": "d3" },
+    { "id": "n11", "floor": "f1", "type": "waiting_area", "x": 420, "y": 250, "label": "Zonă de așteptare" }
+  ],
+  "edges": [
+    { "from": "n1",  "to": "n2",  "distance": 16, "mode": "walk",     "stepFree": true,  "minWidth": 1.8 },
+    { "from": "n2",  "to": "n3",  "distance": 12, "mode": "walk",     "stepFree": true,  "minWidth": 1.5 },
+    { "from": "n2",  "to": "n4",  "distance": 13, "mode": "walk",     "stepFree": true,  "minWidth": 1.5 },
+    { "from": "n2",  "to": "n5",  "distance": 20, "mode": "walk",     "stepFree": true,  "minWidth": 1.6 },
+    { "from": "n2",  "to": "n6",  "distance": 13, "mode": "walk",     "stepFree": true,  "minWidth": 1.2 },
+    { "from": "n3",  "to": "n7",  "distance": 4,  "mode": "elevator", "stepFree": true,  "status": "ok" },
+    { "from": "n4",  "to": "n8",  "distance": 8,  "mode": "stairs",   "stepFree": false },
+    { "from": "n7",  "to": "n9",  "distance": 12, "mode": "walk",     "stepFree": true,  "minWidth": 1.5 },
+    { "from": "n8",  "to": "n11", "distance": 16, "mode": "walk",     "stepFree": true,  "minWidth": 1.4 },
+    { "from": "n9",  "to": "n10", "distance": 10, "mode": "walk",     "stepFree": true,  "minWidth": 0.9 },
+    { "from": "n9",  "to": "n11", "distance": 13, "mode": "walk",     "stepFree": true,  "minWidth": 1.5 }
+  ],
+  "landmarks": [
+    { "nodeId": "n2",  "text": "Panoul de informații este pe peretele din dreapta", "tactile": false },
+    { "nodeId": "n3",  "text": "Liftul are butoane cu marcaj Braille", "tactile": true },
+    { "nodeId": "n9",  "text": "Aici începe coridorul către ghișee", "tactile": false },
+    { "nodeId": "n11", "text": "Scaune și loc liber pentru scaun cu rotile", "tactile": false }
+  ],
+  "services": [
+    { "id": "s1", "name": "Informații", "avgMinutes": 3, "deskIds": ["d1"] },
+    { "id": "s2", "name": "Taxe și impozite", "avgMinutes": 6, "deskIds": ["d3"] }
+  ],
+  "desks": [
+    { "id": "d1", "nodeId": "n5",  "status": "open" },
+    { "id": "d3", "nodeId": "n10", "status": "open" }
+  ]
+}
