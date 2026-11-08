@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
 export function createDatabase(url) {
-  return new PrismaClient({ adapter: new PrismaPg({ connectionString: url, max: 5 }) });
+  return new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
 }
 
 // Retry the entire transaction on a serialization conflict (not individual queries).

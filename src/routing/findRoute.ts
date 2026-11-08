@@ -64,32 +64,83 @@ function buildAdjacency(building: Building, profile: AccessibilityProfile) {
   return adj;
 }
 
+type Adjacency = ReturnType<typeof buildAdjacency>;
+const adjacencyCache = new WeakMap<Building, Map<AccessibilityProfile, Adjacency>>();
+
+function getAdjacency(building: Building, profile: AccessibilityProfile): Adjacency {
+  let byProfile = adjacencyCache.get(building);
+  if (!byProfile) {
+    byProfile = new Map();
+    adjacencyCache.set(building, byProfile);
+  }
+
+  let adjacency = byProfile.get(profile);
+  if (!adjacency) {
+    adjacency = buildAdjacency(building, profile);
+    byProfile.set(profile, adjacency);
+  }
+  return adjacency;
+}
+
+interface QueueItem {
+  node: string;
+  distance: number;
+}
+
+function push(queue: QueueItem[], item: QueueItem) {
+  let index = queue.length;
+  queue.push(item);
+  while (index > 0) {
+    const parent = Math.floor((index - 1) / 2);
+    if (queue[parent].distance <= item.distance) break;
+    queue[index] = queue[parent];
+    index = parent;
+  }
+  queue[index] = item;
+}
+
+function pop(queue: QueueItem[]): QueueItem | undefined {
+  const first = queue[0];
+  const last = queue.pop();
+  if (!first || !last || queue.length === 0) return first;
+
+  let index = 0;
+  while (true) {
+    const left = index * 2 + 1;
+    const right = left + 1;
+    if (left >= queue.length) break;
+    const child = right < queue.length && queue[right].distance < queue[left].distance
+      ? right
+      : left;
+    if (queue[child].distance >= last.distance) break;
+    queue[index] = queue[child];
+    index = child;
+  }
+  queue[index] = last;
+  return first;
+}
+
 function dijkstra(adj: Map<string, Neighbor[]>, start: string, goal: string) {
   const dist = new Map<string, number>([[start, 0]]);
   const prev = new Map<string, { node: string; edge: Edge }>();
-  const done = new Set<string>();
+  const queue: QueueItem[] = [{ node: start, distance: 0 }];
 
-  while (true) {
-    let current: string | null = null;
-    let best = Infinity;
-    for (const [id, d] of dist) {
-      if (!done.has(id) && d < best) {
-        best = d;
-        current = id;
-      }
-    }
-    if (current === null) return null; // nu există traseu pentru acest profil
-    if (current === goal) break;
-    done.add(current);
+  while (queue.length > 0) {
+    const current = pop(queue)!;
+    if (current.distance !== dist.get(current.node)) continue;
+    if (current.node === goal) break;
 
-    for (const n of adj.get(current) ?? []) {
-      const nd = best + n.cost;
+    for (const n of adj.get(current.node) ?? []) {
+      const nd = current.distance + n.cost;
       if (nd < (dist.get(n.to) ?? Infinity)) {
         dist.set(n.to, nd);
-        prev.set(n.to, { node: current, edge: n.edge });
+        prev.set(n.to, { node: current.node, edge: n.edge });
+        push(queue, { node: n.to, distance: nd });
       }
     }
   }
+
+  if (!dist.has(goal)) return null; // nu există traseu pentru acest profil
 
   const nodePath = [goal];
   const edges: Edge[] = [];
@@ -152,17 +203,24 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
     const a = nodes.get(nodePath[i])!;
     const b = nodes.get(nodePath[i + 1])!;
 
-    if (edge.mode === 'elevator' || edge.mode === 'stairs') {
+    if (
+      edge.mode === 'elevator' ||
+      edge.mode === 'stairs' ||
+      (edge.mode === 'ramp' && a.floor !== b.floor)
+    ) {
       flushWalk();
       lastVec = null;
       const floorName = floors.get(b.floor)?.name ?? b.floor;
+      const action = edge.mode;
       steps.push({
         id: nextId++,
-        action: edge.mode,
+        action,
         text:
-          edge.mode === 'elevator'
+          action === 'elevator'
             ? `Ia ${a.label ?? 'liftul'} până la ${floorName}`
-            : `Folosește scările până la ${floorName}`,
+            : action === 'stairs'
+              ? `Folosește scările până la ${floorName}`
+              : `Folosește rampa până la ${floorName}`,
         toFloor: b.floor,
         nodeId: b.id,
       });
@@ -218,7 +276,7 @@ export function findRoute(
   const known = new Set(building.nodes.map((n) => n.id));
   if (!known.has(fromId) || !known.has(toId)) return null;
 
-  const adj = buildAdjacency(building, profile);
+  const adj = getAdjacency(building, profile);
   const result = dijkstra(adj, fromId, toId);
   if (!result) return null;
 

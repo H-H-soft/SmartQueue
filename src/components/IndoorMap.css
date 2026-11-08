@@ -1,218 +1,32 @@
-/* These styles apply only to the IndoorMap component. */
-
-.sq-map {
-  margin: 24px 0;
-  padding: 20px;
-  border: 1px solid #cbd5e1;
-  border-radius: 16px;
-  background: #ffffff;
-  color: #172033;
-  text-align: left;
-  font-family: system-ui, sans-serif;
-  line-height: 1.5;
-}
-
-.sq-map,
-.sq-map * {
-  box-sizing: border-box;
-}
-
-.sq-map__header h2 {
-  margin: 0 0 8px;
-  color: #172033;
-  font-size: 1.4rem;
-}
-
-.sq-map__header p {
-  margin: 0 0 20px;
-  color: #475569;
-  font-size: 0.95rem;
-}
-
-.sq-map__floors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.sq-map button {
-  min-height: 48px;
-  padding: 10px 16px;
-  border: 1px solid #64748b;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #172033;
-  font: inherit;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.sq-map button:hover {
-  background: #eff6ff;
-  border-color: #1d4ed8;
-}
-
-.sq-map button[aria-pressed="true"] {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  color: #ffffff;
-}
-
-.sq-map button:focus-visible,
-.sq-map__viewport:focus-visible {
-  outline: 3px solid #a16207;
-  outline-offset: 4px;
-}
-
-.sq-map__floor-name {
-  margin: 16px 0 12px;
-}
-
-.sq-map__viewport {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  background: #f8fafc;
-}
-
-.sq-map__drawing {
-  display: block;
-  width: 100%;
-  min-width: 520px;
-  height: auto;
-}
-
-.sq-map__background {
-  fill: #f8fafc;
-  stroke: #cbd5e1;
-  stroke-width: 2;
-}
-
-.sq-map__corridor {
-  stroke: #cbd5e1;
-  stroke-width: 22;
-  stroke-linecap: round;
-}
-
-.sq-map__corridor--closed {
-  stroke: #b91c1c;
-  stroke-dasharray: 4 12;
-}
-
-.sq-map__route {
-  stroke: #1d4ed8;
-  stroke-width: 7;
-  stroke-linecap: round;
-  fill: none;
-}
-
-.sq-map__node {
-  fill: #ffffff;
-  stroke: #172033;
-  stroke-width: 2;
-}
-
-.sq-map__node--start {
-  fill: #1d4ed8;
-}
-
-.sq-map__node--destination {
-  fill: #15803d;
-}
-
-.sq-map__label {
-  fill: #172033;
-  stroke: #f8fafc;
-  stroke-width: 4;
-  paint-order: stroke;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.sq-map__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  padding: 0;
-  margin: 16px 0 0;
-  list-style: none;
-  font-size: 0.9rem;
-}
-
-.sq-map__legend li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sq-map__key {
-  display: inline-block;
-  width: 26px;
-  height: 0;
-  border-top: 5px solid;
-}
-
-.sq-map__key--route {
-  border-color: #1d4ed8;
-}
-
-.sq-map__key--corridor {
-  border-color: #cbd5e1;
-}
-
-.sq-map__key--closed {
-  border-color: #b91c1c;
-  border-top-style: dotted;
-}
-
-.sq-map__transition {
-  margin-top: 16px;
-  padding: 14px;
-  border-left: 4px solid #1d4ed8;
-  border-radius: 6px;
-  background: #eff6ff;
-}
-
-.sq-map__transition p {
-  margin: 0 0 10px;
-}
-
-.sq-map__notice {
-  padding: 12px;
-  margin: 16px 0 0;
-  border: 1px solid #b45309;
-  border-radius: 8px;
-  background: #fffbeb;
-  color: #78350f;
-}
-
-@media (max-width: 600px) {
-  .sq-map {
-    padding: 12px;
-  }
-
-  .sq-map__floors button {
-    flex: 1;
-  }
-}
-
+.map-panel { margin: 17px 0 0; padding: 12px; border: 1px solid #e4eae3; border-radius: 13px; background: #fcfdfb; color: #24372e; }
+.map-panel__heading { display: flex; align-items: center; justify-content: space-between; }
+.map-panel__heading h3 { margin: 0 0 3px; color: #35493d; font-size: .83rem; }
+.map-panel__heading p { margin: 0 0 10px; color: #839087; font-size: .68rem; }
+.map-scroll { width: 100%; overflow: auto; border: 1px solid #e7ece6; border-radius: 9px; background-color: #f7f9f6; background-image: radial-gradient(#dfe7df 1px,transparent 1px); background-size: 16px 16px; overscroll-behavior-inline: contain; }
+.indoor-map { display: block; width: 100%; min-width: 520px; height: auto; }
+.indoor-map__background { fill: #f8faf7; fill-opacity: .88; stroke: #dce5db; stroke-width: 2; }
+.indoor-map__corridor { stroke: #bdcbbf; stroke-width: 22; stroke-linecap: round; }
+.indoor-map__corridor--closed { stroke: #bf6e5c; stroke-dasharray: 5 10; }
+.indoor-map__route { stroke: #188164; stroke-width: 8; stroke-linecap: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 1px 1px #ffffff); }
+.indoor-map__node { fill: #fff; stroke: #78917e; stroke-width: 2; }
+.indoor-map__node--start { fill: #e1b152; stroke: #8c6623; }
+.indoor-map__node--destination { fill: #188164; stroke: #0e6049; }
+.indoor-map__active-ring { fill: none; stroke: #bd8424; stroke-width: 4; }
+.indoor-map__label,.indoor-map__endpoint { fill: #304239; font-family: inherit; font-size: 12px; font-weight: 700; }
+.indoor-map__label { stroke: #f8faf7; stroke-width: 4; paint-order: stroke; }
+.indoor-map__endpoint { fill: #fff; stroke: #315746; stroke-width: 3px; paint-order: stroke; font-size: 10px; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 8px 17px; padding: 0; margin: 11px 0 0; list-style: none; color: #758179; font-size: .64rem; }
+.map-legend li { display: flex; align-items: center; gap: 7px; }
+.map-legend__swatch { display: inline-block; width: 20px; height: 0; border-top: 4px solid; }
+.map-legend__swatch--route { border-color: #188164; }
+.map-legend__swatch--corridor { border-color: #bdcbbf; }
+.map-legend__swatch--closed { border-color: #bf6e5c; border-top-style: dotted; }
+@media (max-width: 600px) { .map-panel { padding: 9px; } .indoor-map { min-width: 490px; } }
 @media (forced-colors: active) {
-  .sq-map__route {
-    stroke: Highlight;
-  }
-
-  .sq-map__corridor {
-    stroke: GrayText;
-  }
-
-  .sq-map__node {
-    fill: Canvas;
-    stroke: CanvasText;
-  }
-
-  .sq-map__label {
-    fill: CanvasText;
-    stroke: Canvas;
-  }
+  .indoor-map__background { fill: Canvas; stroke: CanvasText; }
+  .indoor-map__route { stroke: Highlight; }
+  .indoor-map__corridor { stroke: GrayText; }
+  .indoor-map__node,.indoor-map__node--start,.indoor-map__node--destination { fill: Canvas; stroke: CanvasText; }
+  .indoor-map__label,.indoor-map__endpoint { fill: CanvasText; stroke: Canvas; }
+  .indoor-map__active-ring { fill: none; stroke: Highlight; }
 }

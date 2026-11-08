@@ -147,7 +147,7 @@ export default function QueuePanel({ profile, onNavigate }: {
     finally { lock.current = false; setStaffLoading(false); }
   }
 
-  return <section className="queue-section" aria-labelledby="queue-heading">
+  return <section id="queue" className="queue-section" aria-labelledby="queue-heading">
     <div className="section-heading"><div><span className="eyebrow">Fără tichet de hârtie</span><h2 id="queue-heading">Locul tău la rând</h2></div>
       <span className={`connection ${connected ? 'online' : ''}`}>{connected ? 'Actualizare în timp real' : 'Actualizare periodică'}</span></div>
     {error && <p className="notice error" role="alert">{error} <button className="text-button" onClick={() => window.location.reload()}>Reîncarcă</button></p>}
