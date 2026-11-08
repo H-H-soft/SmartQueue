@@ -132,3 +132,78 @@ export interface Ticket {
   positionInQueue?: number;
   estimatedWaitMinutes?: number;
 }
+
+// ---------- Contractul API pentru cozi ----------
+// Tipurile existente de mai sus rămân compatibile cu datele hărții.
+// API-ul folosește statusuri explicite și null pentru valori indisponibile.
+export type QueueTicketStatus =
+  | 'WAITING' | 'CALLED' | 'SERVING' | 'COMPLETED' | 'CANCELLED' | 'MISSED';
+
+export interface QueueService {
+  id: string;
+  name: string;
+  prefix: string;
+  avgMinutes: number;
+  active: boolean;
+}
+
+export interface QueueDesk {
+  id: string;
+  name: string;
+  buildingId: string;
+  floor: number;
+  locationId: string; // ID-ul nodului din Building.nodes, folosit de findRoute.
+  status: 'OPEN' | 'PAUSED' | 'CLOSED';
+}
+
+export interface QueueDeskSummary extends QueueDesk {
+  services: { id: string; name: string }[];
+  tickets: { number: string; status: QueueTicketStatus }[];
+}
+
+export interface QueueTicket {
+  id: string;
+  number: string;
+  sequence: number;
+  serviceId: string;
+  profile: AccessibilityProfile;
+  status: QueueTicketStatus;
+  deskId: string | null;
+  desk: QueueDesk | null;
+  createdAt: string;
+  calledAt: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  visitorsAhead: number;
+  positionInQueue: number | null;
+  estimatedWaitMinutes: number | null;
+  estimateIsApproximate: boolean;
+}
+
+export interface CreatedQueueTicket extends QueueTicket {
+  accessToken: string; // Returnat doar la creare; nu se publică în evenimente.
+}
+
+export interface QueueSummary {
+  id: string;
+  name: string;
+  active: boolean;
+  waitingCount: number;
+  activeDesks: number;
+  availableDesks: number;
+  avgMinutes: number;
+  estimatedWaitMinutes: number | null;
+  estimateIsApproximate: boolean;
+}
+
+export type QueueEventName =
+  | 'TICKET_CREATED' | 'TICKET_CALLED' | 'DESK_ASSIGNED' | 'DESK_CHANGED'
+  | 'TICKET_SERVING' | 'TICKET_COMPLETED' | 'TICKET_CANCELLED' | 'TICKET_MISSED';
+
+export interface QueueAnnouncement {
+  event: QueueEventName;
+  serviceId: string;
+  ticketNumber: string;
+  status: QueueTicketStatus;
+  desk: QueueDesk | null;
+}

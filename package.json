@@ -7,11 +7,25 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:backend": "node --env-file=.env --watch src/queue/server.js",
+    "start:backend": "node --env-file=.env src/queue/server.js",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "node --env-file=.env prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.4",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -23,9 +37,14 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
+
+    "prisma": "^7.10.1",
     "qrcode": "^1.5.4",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.6"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }
