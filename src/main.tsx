@@ -8,3 +8,12 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+import './VoiceGuidance.js';
+
+(window as unknown as { VoiceGuide: { init: (o: object) => void } }).VoiceGuide.init({
+  content: '#root',
+  settings: { engine: 'browser' },
+});
+
+import './qr/qr-scanner.js';

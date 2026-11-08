@@ -31,7 +31,20 @@ export default function App() {
   const [from, setFrom] = useState(places[0].id);
   const [to, setTo] = useState(places[places.length - 1].id);
   const [profile, setProfile] = useState<AccessibilityProfile>('wheelchair');
+  const [scanMessage, setScanMessage] = useState('');
 
+async function scanStart() {
+  const r = await window.QrStart.open();
+  if (!r) return;
+  const place = places.find((p) => p.id === r.id);
+  if (place) {
+    setFrom(place.id);
+    setScanMessage('');
+    window.VoiceGuide.speakOnce(`Punct de start: ${place.label}`);
+  } else {
+    setScanMessage('Acest cod QR nu corespunde niciunui punct de start.');
+  }
+}
   const route = useMemo(() => findRoute(building, from, to, profile), [from, to, profile]);
 
   return (
@@ -55,7 +68,7 @@ export default function App() {
       <span className="eyebrow">Orientare în clădire</span>
       <h2 id="navigation-heading" tabIndex={-1}>Traseul tău accesibil</h2>
 
-      <p>
+          <p>
         <label>
           Pornesc de la:{' '}
           <select value={from} onChange={(e) => setFrom(e.target.value)}>
@@ -65,6 +78,10 @@ export default function App() {
           </select>
         </label>
       </p>
+      <p>
+        <button type="button" onClick={scanStart}>Scanează codul QR de start</button>
+      </p>
+      {scanMessage && <p role="alert">{scanMessage}</p>}
 
       <p>
         <label>
