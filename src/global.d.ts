@@ -1,19 +1,15 @@
-<<<<<<< Updated upstream
-interface Window {
-     VoiceGuide: { init(o: object): void; speakOnce(t: string): Promise<void>; stop(): void };
-     QrStart: { open(o?: object): Promise<{ id: string; raw: string } | null>; readStartFromUrl(): string | null };
-   }
-=======
 export {};
 
 declare global {
   interface Window {
     QrStart: {
-      open: () => Promise<{ id: string; raw: string } | null>;
+      open: (options?: object) => Promise<{ id: string; raw: string } | null>;
+      readStartFromUrl: () => string | null;
     };
     VoiceGuide?: {
+      init: (options: object) => void;
       speakOnce: (text: string) => void | Promise<void>;
+      stop: () => void;
     };
   }
 }
->>>>>>> Stashed changes

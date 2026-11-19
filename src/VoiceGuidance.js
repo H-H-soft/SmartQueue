@@ -77,7 +77,7 @@
         audio.onerror = () => (S.engine === 'server' ? resolve() : fallback());
         await audio.play();
       } catch (e) {
-        if (S.engine === 'server') { say('Server voice unavailable.'); return resolve(); }
+        if (S.engine === 'server') { say('Vocea serverului nu este disponibilă.'); return resolve(); }
         serverDownUntil = Date.now() + 60000;
         fallback();
       }
@@ -103,7 +103,7 @@
       if (my !== session) return;
       idx++;
     }
-    if (my === session && state === 'playing') { state = 'stopped'; idx = 0; clearMark(); say('Finished reading.'); render(); }
+    if (my === session && state === 'playing') { state = 'stopped'; idx = 0; clearMark(); say('Citirea s-a încheiat.'); render(); }
   }
   function startAt(i) {
     silence();
@@ -115,13 +115,13 @@
     if (state === 'playing') return pause();
     if (state === 'stopped') {
       queue = buildQueue();
-      if (!queue.length) return say('Nothing to read on this page.');
+      if (!queue.length) return say('Nu există text de citit pe această pagină.');
       return startAt(0);
     }
     startAt(idx);
   }
-  function pause() { state = 'paused'; session++; silence(); say('Paused.'); render(); }
-  function stop() { state = 'stopped'; session++; silence(); idx = 0; clearMark(); say('Stopped.'); render(); }
+  function pause() { state = 'paused'; session++; silence(); say('Citirea este în pauză.'); render(); }
+  function stop() { state = 'stopped'; session++; silence(); idx = 0; clearMark(); say('Citirea a fost oprită.'); render(); }
   function skip(d) {
     if (state === 'stopped') { queue = buildQueue(); if (!queue.length) return; idx = 0; if (d < 0) d = 0; }
     startAt(idx + d);
@@ -133,50 +133,81 @@
 
   // ---------- UI
   function render() {
-    ui.play.textContent = state === 'playing' ? 'Pause' : state === 'paused' ? 'Resume' : 'Play';
+    ui.play.textContent = state === 'playing' ? 'Pauză' : state === 'paused' ? 'Continuă' : 'Pornește';
+    ui.play.setAttribute('aria-label', state === 'playing' ? 'Pune pauză la citire' : state === 'paused' ? 'Continuă citirea' : 'Pornește citirea paginii');
     ui.guide.setAttribute('aria-pressed', String(S.formGuidance));
-    ui.guide.textContent = 'Form guidance: ' + (S.formGuidance ? 'on' : 'off');
+    ui.guideState.textContent = S.formGuidance ? 'Activată' : 'Oprită';
     ui.rateOut.textContent = S.rate.toFixed(1) + 'x';
+  }
+  function setPanelOpen(open, focus = false) {
+    ui.panel.hidden = !open;
+    ui.launcher.setAttribute('aria-expanded', String(open));
+    if (open && focus) ui.play.focus();
+    if (!open && focus) ui.launcher.focus();
   }
   function buildBar() {
     const css = document.createElement('style');
-    css.textContent =
-      '#vg-bar{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;padding:.6rem 1rem;background:#eef3fa;color:#111;border-bottom:2px solid #9fb0c8;font:1rem system-ui,sans-serif}' +
-      '#vg-bar button,#vg-bar select{font:inherit;min-height:44px;min-width:44px;padding:.3rem .8rem;border:2px solid #9fb0c8;border-radius:8px;background:#fff;color:#111}' +
-      '#vg-bar button{cursor:pointer;font-weight:600}#vg-bar button[aria-pressed="true"],#vg-bar [data-a=play]{background:#0b57d0;color:#fff;border-color:#0b57d0}' +
-      '#vg-bar label{display:inline-flex;gap:.4rem;align-items:center}#vg-msg{flex-basis:100%;margin:0;font-size:.95rem}' +
-      '.vg-current{background:#fff3b0;color:#111;outline:3px solid #8a6d00;outline-offset:3px;border-radius:4px}' +
-      '@media (prefers-color-scheme:dark){#vg-bar{background:#1e2430;color:#f2f2f2;border-color:#3b4658}#vg-bar button,#vg-bar select{background:#121417;color:#f2f2f2;border-color:#3b4658}.vg-current{background:#3d3400;color:#fff;outline-color:#ffd84d}}';
+    css.textContent = `
+      #vg-launcher{position:fixed;right:24px;bottom:24px;z-index:40;display:inline-flex;align-items:center;gap:9px;min-height:46px;padding:0 16px;border:1px solid #155b49;border-radius:13px;color:#fff;background:#176b58;box-shadow:0 8px 24px #153d302e;font:650 14px/1 system-ui,sans-serif;cursor:pointer;transition:transform .16s ease,background .16s ease}
+      #vg-launcher:hover{background:#105642;transform:translateY(-1px)}#vg-launcher:focus-visible,#vg-bar button:focus-visible,#vg-bar select:focus-visible,#vg-bar input:focus-visible{outline:3px solid #c88725;outline-offset:3px}
+      #vg-launcher .vg-launcher-icon{display:grid;width:25px;height:25px;place-items:center;border-radius:8px;background:#ffffff20;font-size:16px}
+      #vg-bar{position:fixed;right:24px;bottom:82px;z-index:41;width:min(370px,calc(100vw - 28px));max-height:min(80vh,620px);overflow:auto;padding:16px;border:1px solid #e0e8e1;border-radius:17px;color:#263a30;background:#fff;box-shadow:0 18px 55px #183b2e2b;font:14px/1.45 system-ui,'Segoe UI',sans-serif}
+      #vg-bar[hidden]{display:none}#vg-launcher[aria-expanded=true]{box-shadow:0 0 0 3px #176b5830,0 8px 24px #153d302e}
+      .vg-panel-head{display:flex;align-items:center;gap:11px;margin-bottom:15px}.vg-panel-icon{display:grid;width:40px;height:40px;flex:none;place-items:center;border-radius:12px;color:#176b58;background:#eaf4ed;font-size:20px}.vg-panel-title{min-width:0;flex:1}.vg-panel-title strong,.vg-panel-title small{display:block}.vg-panel-title strong{color:#20382c;font-size:14px}.vg-panel-title small{margin-top:3px;color:#7a887e;font-size:11px}.vg-close{width:36px;min-width:36px!important;height:36px;min-height:36px!important;padding:0!important;border:0!important;border-radius:9px!important;color:#68776d!important;background:#f3f6f3!important;font-size:21px!important}
+      #vg-bar .vg-playback{display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr;gap:7px;margin-bottom:15px}#vg-bar button{min-width:0;min-height:42px;padding:0 10px;border:1px solid #dce5dd;border-radius:9px;color:#3c5948;background:#fff;font:650 12px/1 system-ui,sans-serif;cursor:pointer}#vg-bar button:hover{background:#f3f8f4;border-color:#c5d9c9}#vg-bar button[data-a=play]{border-color:#176b58;color:#fff;background:#176b58}#vg-bar button[data-a=play]:hover{background:#105642}
+      .vg-status{display:flex;align-items:flex-start;gap:8px;min-height:35px;margin:0 0 13px;padding:9px 10px;border-radius:9px;color:#63736a;background:#f5f8f5;font-size:11px}.vg-status:before{width:7px;height:7px;flex:none;margin-top:4px;border-radius:50%;background:#76a784;content:''}#vg-msg{margin:0}
+      .vg-rate-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin:0 0 13px;color:#59695f;font-size:11px;font-weight:650}.vg-rate-row input{width:100%;min-height:20px;margin:0;accent-color:#176b58}.vg-rate-row output{min-width:34px;color:#37674d;text-align:right;font-variant-numeric:tabular-nums}
+      .vg-settings{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}.vg-settings label{display:block;color:#718077;font-size:10px;font-weight:700}.vg-settings select{display:block;width:100%;min-height:38px;margin:5px 0 0;padding:0 9px;border:1px solid #dce5dd;border-radius:8px;color:#33483c;background:#fff;font:12px system-ui,sans-serif}
+      #vg-bar .vg-guide{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:42px;padding:0 11px;color:#53675b;background:#f5f8f5}#vg-bar .vg-guide[aria-pressed=true]{border-color:#cee2d1;color:#296346;background:#eff8f0}.vg-guide-state{color:#7a887e;font-size:10px}
+      .vg-shortcut{margin:11px 0 0;color:#89948c;font-size:10px}.vg-shortcut kbd{padding:2px 5px;border:1px solid #dfe6df;border-radius:4px;color:#5b6d60;background:#f8faf8;font:inherit}
+      .vg-current{border-radius:4px;background:#fff2bd;color:#172d22;outline:3px solid #a87c21;outline-offset:3px}
+      @media(max-width:700px){#vg-launcher{right:14px;bottom:85px;min-height:43px;padding:0 13px}#vg-bar{right:14px;bottom:137px;width:min(370px,calc(100vw - 28px));padding:14px}}
+      @media(prefers-reduced-motion:reduce){#vg-launcher{transition:none}}
+      @media(forced-colors:active){#vg-launcher,#vg-bar button{border:1px solid ButtonText!important}#vg-bar{border:1px solid CanvasText;background:Canvas;color:CanvasText}}
+    `;
     document.head.appendChild(css);
-    const bar = document.createElement('div');
-    bar.id = 'vg-bar'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Voice guidance controls');
+    const launcher = document.createElement('button');
+    launcher.id = 'vg-launcher'; launcher.type = 'button'; launcher.setAttribute('aria-haspopup', 'dialog');
+    launcher.setAttribute('aria-expanded', 'false'); launcher.setAttribute('aria-controls', 'vg-bar');
+    launcher.innerHTML = '<span class="vg-launcher-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none"><path d="M4 10v4h3l4 3V7l-4 3H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 9a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Ghidare vocală</span>';
+    const bar = document.createElement('section');
+    bar.id = 'vg-bar'; bar.setAttribute('role', 'dialog'); bar.setAttribute('aria-labelledby', 'vg-title'); bar.hidden = true;
     bar.innerHTML =
-      '<button type="button" data-a="play" aria-keyshortcuts="Alt+P">Play</button>' +
-      '<button type="button" data-a="back" aria-label="Previous sentence">Back</button>' +
-      '<button type="button" data-a="next" aria-label="Next sentence">Next</button>' +
-      '<button type="button" data-a="stop" aria-keyshortcuts="Alt+S">Stop</button>' +
-      '<label>Speed <input type="range" data-a="rate" min="0.7" max="1.6" step="0.1"> <output data-a="rateOut"></output></label>' +
-      '<label>Language <select data-a="lang"><option value="ro-RO">Rom\u00e2n\u0103</option><option value="en-US">English</option></select></label>' +
-      '<label>Voice <select data-a="gender"><option value="female">Female</option><option value="male">Male</option></select></label>' +
-      '<button type="button" data-a="guide" aria-pressed="false">Form guidance</button>' +
-      '<p id="vg-msg" role="status"></p>';
-    (cfg.mount ? document.querySelector(cfg.mount) : document.body).prepend(bar);
+      '<div class="vg-panel-head"><span class="vg-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M4 10v4h3l4 3V7l-4 3H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 9a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="vg-panel-title"><strong id="vg-title">Ghidare vocală</strong><small>Ascultă și navighează prin conținut</small></span><button type="button" class="vg-close" data-a="close" aria-label="Închide meniul">×</button></div>' +
+      '<div class="vg-status"><p id="vg-msg" role="status" aria-live="polite">Gata pentru citire.</p></div>' +
+      '<div class="vg-playback"><button type="button" data-a="back" aria-label="Propoziția anterioară">←</button>' +
+      '<button type="button" data-a="play" aria-keyshortcuts="Alt+P">Pornește</button>' +
+      '<button type="button" data-a="next" aria-label="Propoziția următoare">→</button>' +
+      '<button type="button" data-a="stop" aria-label="Oprește citirea" aria-keyshortcuts="Alt+S">■</button></div>' +
+      '<label class="vg-rate-row" for="vg-rate"><span>Viteză</span><input id="vg-rate" type="range" data-a="rate" min="0.7" max="1.6" step="0.1"><output data-a="rateOut" for="vg-rate"></output></label>' +
+      '<div class="vg-settings"><label for="vg-language">Limbă<select id="vg-language" data-a="lang"><option value="ro-RO">Română</option><option value="en-US">English</option></select></label>' +
+      '<label for="vg-gender">Voce<select id="vg-gender" data-a="gender"><option value="female">Femeie</option><option value="male">Bărbat</option></select></label></div>' +
+      '<button type="button" class="vg-guide" data-a="guide" aria-pressed="false"><span>Ghidare formulare</span><span class="vg-guide-state" data-a="guideState">Oprită</span></button>' +
+      '<p class="vg-shortcut">Scurtături: <kbd>Alt</kbd> + <kbd>P</kbd> pornește/oprește · <kbd>Alt</kbd> + <kbd>S</kbd> oprește</p>';
+    const mount = cfg.mount ? document.querySelector(cfg.mount) : document.body;
+    mount.append(launcher, bar);
+    launcher.onclick = () => setPanelOpen(bar.hidden, bar.hidden);
     bar.querySelectorAll('[data-a]').forEach(n => (ui[n.dataset.a] = n));
-    ui.msg = bar.querySelector('#vg-msg');
+    ui.launcher = launcher; ui.panel = bar; ui.msg = bar.querySelector('#vg-msg');
     ui.rate.value = S.rate; ui.lang.value = S.language; ui.gender.value = S.gender;
 
     ui.play.onclick = play; ui.stop.onclick = stop;
     ui.back.onclick = () => skip(-1); ui.next.onclick = () => skip(1);
+    ui.close.onclick = () => setPanelOpen(false, true);
     ui.rate.oninput = () => { S.rate = parseFloat(ui.rate.value); if (audio) audio.playbackRate = S.rate; render(); };
     ui.rate.onchange = () => { saveSettings(); if (state === 'playing' && !audio) startAt(idx); };
     ui.lang.onchange = () => { S.language = ui.lang.value; S.voiceURI = ''; saveSettings(); if (state === 'playing') startAt(idx); };
     ui.gender.onchange = () => { S.gender = ui.gender.value; saveSettings(); if (state === 'playing') startAt(idx); };
-    ui.guide.onclick = () => { S.formGuidance = !S.formGuidance; saveSettings(); render(); say('Form guidance ' + (S.formGuidance ? 'on.' : 'off.')); };
+    ui.guide.onclick = () => { S.formGuidance = !S.formGuidance; saveSettings(); render(); say('Ghidarea formularelor ' + (S.formGuidance ? 'activată.' : 'oprită.')); };
     document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !ui.panel.hidden) { e.preventDefault(); setPanelOpen(false, true); return; }
       if (!e.altKey) return;
       const k = e.key.toLowerCase();
-      if (k === 'p') { e.preventDefault(); play(); }
-      if (k === 's') { e.preventDefault(); stop(); }
+      if (k === 'p') { e.preventDefault(); setPanelOpen(true); play(); }
+      if (k === 's') { e.preventDefault(); setPanelOpen(true); stop(); }
+    });
+    document.addEventListener('pointerdown', e => {
+      if (!ui.panel.hidden && !ui.panel.contains(e.target) && !ui.launcher.contains(e.target)) setPanelOpen(false);
     });
   }
 
@@ -202,7 +233,7 @@
     if (opts && opts.settings) Object.assign(S, opts.settings); // e.g. preferences loaded from the API
     if (synth) { voices = synth.getVoices(); synth.onvoiceschanged = () => { voices = synth.getVoices(); }; }
     buildBar(); initFormGuidance(); render();
-    say('Ready. Press Play (Alt+P) to hear this page.');
+    say('Gata pentru citire. Apasă Pornește sau folosește Alt+P.');
     addEventListener('pagehide', silence);
   }
   global.VoiceGuide = {
