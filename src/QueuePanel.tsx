@@ -182,7 +182,7 @@ export default function QueuePanel({ profile, onNavigate }: {
         </> : <><span className="ticket-placeholder" aria-hidden="true">№</span><h3>{credentials ? 'Se recuperează tichetul…' : 'Tichetul tău apare aici'}</h3><p className="muted">{credentials ? 'Păstrează această pagină deschisă.' : 'Alege un serviciu și apasă „Ia un tichet”. Păstrează această pagină deschisă pentru actualizări.'}</p></>}
       </div>
     </div>
-    <details className="staff-panel"><summary>Panou personal · administrare ghișeu</summary>
+    <details id="staff-panel" className="staff-panel"><summary>Panou personal · administrare ghișeu</summary>
       <form className="staff-login" onSubmit={(event) => { event.preventDefault(); setStaffKey(keyInput.trim()); setKeyInput(''); setStaffMessage(''); }}>
         <label htmlFor="staff-key">Cheie de acces personal</label><input id="staff-key" type="password" autoComplete="off" value={keyInput} onChange={(e) => setKeyInput(e.target.value)} placeholder="Cheia STAFF_API_KEY din .env" required />
         <button type="submit" className="secondary">Conectare</button>
