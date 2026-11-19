@@ -1,7 +1,7 @@
 :root {
-  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: #1d3028;
-  background: #f4f6f3;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: #282d29;
+  background: #f5f5f1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
