@@ -41,9 +41,10 @@ async function api<T>(path: string, options: { method?: string; token?: string; 
   return data;
 }
 
-export default function QueuePanel({ profile, onNavigate }: {
+export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
   profile: AccessibilityProfile;
   onNavigate: (ticket: QueueTicket) => void;
+  mode?: 'visitor' | 'staff';
 }) {
   const [services, setServices] = useState<QueueService[]>([]);
   const [desks, setDesks] = useState<QueueDeskSummary[]>([]);
@@ -85,7 +86,17 @@ export default function QueuePanel({ profile, onNavigate }: {
         if (!live || current !== version) return;
         setServices(catalogue); setDesks(deskList); setTicket(state); setSummary(queue); setError('');
       } catch (cause) {
-        if (live && current === version) setError((cause as Error).message);
+        if (live && current === version) {
+          const message = (cause as Error).message;
+          if (credentials && message.startsWith('Acces refuzat')) {
+            remember(null);
+            setCredentials(null);
+            setTicket(null);
+            setError('Tichetul salvat nu mai este valabil. Poți solicita unul nou.');
+          } else {
+            setError(message);
+          }
+        }
       } finally { if (live) setLoading(false); }
     }
     const socket = io();
@@ -147,42 +158,49 @@ export default function QueuePanel({ profile, onNavigate }: {
     finally { lock.current = false; setStaffLoading(false); }
   }
 
-  return <section id="queue" className="queue-section" aria-labelledby="queue-heading">
-    <div className="section-heading"><div><span className="eyebrow">Fără tichet de hârtie</span><h2 id="queue-heading">Locul tău la rând</h2></div>
+  return <section id={mode === 'visitor' ? 'queue' : 'staff-page'} className={`queue-section queue-page queue-page--${mode}`} aria-labelledby="queue-heading">
+    {mode === 'visitor' && <>
+    <div className="section-heading"><div><span className="eyebrow">SERVICII ȘI PROGRAMĂRI</span><h2 id="queue-heading">{ticket && !terminal(ticket) ? 'Urmărește-ți rândul' : 'Solicită un tichet'}</h2><p className="section-description">{ticket && !terminal(ticket) ? 'Păstrează pagina deschisă pentru actualizări despre chemarea ta.' : 'Alege serviciul de care ai nevoie. Nu trebuie să oferi date personale.'}</p></div>
       <span className={`connection ${connected ? 'online' : ''}`}>{connected ? 'Actualizare în timp real' : 'Actualizare periodică'}</span></div>
     {error && <p className="notice error" role="alert">{error} <button className="text-button" onClick={() => window.location.reload()}>Reîncarcă</button></p>}
-    <div className="queue-grid">
-      <div className="panel">
-        <h3>Alege serviciul</h3>
-        <label htmlFor="queue-service">Serviciu</label>
-        <select id="queue-service" value={serviceId} onChange={(e) => setSelectedService(e.target.value)} disabled={loading || pending}>
-          {!services.length && <option value="">{loading ? 'Se încarcă…' : 'Niciun serviciu disponibil'}</option>}
-          {services.map((service) => <option key={service.id} value={service.id}>{service.name}{!service.active ? ' — închis' : ''}</option>)}
-        </select>
-        {summary && <div className="queue-metrics"><div><strong>{summary.waitingCount}</strong><span>persoane în așteptare</span></div><div><strong>{summary.estimatedWaitMinutes === null ? '—' : `~${summary.estimatedWaitMinutes} min`}</strong><span>așteptare estimată</span></div></div>}
-        {summary?.estimatedWaitMinutes === null && <p className="muted">Estimarea nu este disponibilă momentan.</p>}
-        <p className="muted">Tichetul folosește profilul de accesibilitate ales mai sus. Timpul de așteptare este aproximativ.</p>
-        <button className="primary" disabled={loading || pending || Boolean(credentials) || !services.find((s) => s.id === serviceId)?.active}
+    {ticket && terminal(ticket) ? <section className="ticket-finished" aria-live="polite">
+      <span className="ticket-finished__mark" aria-hidden="true">✓</span><div><span className="eyebrow">TICHET {ticket.number}</span><h3>{ticket.status === 'COMPLETED' ? 'Servirea a fost finalizată' : ticket.status === 'CANCELLED' ? 'Tichetul a fost anulat' : 'Tichetul a fost închis'}</h3><p>{ticket.status === 'COMPLETED' ? 'Dacă mai ai nevoie de ajutor, poți solicita un tichet nou.' : 'Poți solicita un tichet nou când ești pregătit.'}</p></div><button className="primary" type="button" onClick={() => { remember(null); setCredentials(null); setTicket(null); }}>Solicită alt tichet</button>
+    </section> : credentials && loading && !ticket ? <div className="ticket-loading" role="status"><span className="ticket-placeholder" aria-hidden="true">…</span><p>Se verifică tichetul salvat…</p></div> : !ticket ? <div className="queue-grid">
+      <div className="panel service-panel">
+        <div className="service-panel__heading"><div><span className="eyebrow">PASUL 1</span><h3>Alege serviciul</h3></div><span className="service-panel__privacy">Fără date personale</span></div>
+        {loading && !services.length ? <p className="muted">Se încarcă serviciile…</p> : services.length ? <div className="service-options" role="group" aria-label="Servicii disponibile">
+          {services.map((service) => <button key={service.id} type="button" className={`service-option${serviceId === service.id ? ' selected' : ''}`} aria-pressed={serviceId === service.id} disabled={!service.active || pending} onClick={() => setSelectedService(service.id)}>
+            <span className="service-option__mark" aria-hidden="true">{service.prefix}</span><span className="service-option__body"><strong>{service.name}</strong><small>{service.active ? `Durată medie: ${service.avgMinutes} min / persoană` : 'Momentan indisponibil'}</small></span><span className="service-option__radio" aria-hidden="true" />
+          </button>)}
+        </div> : <p className="muted">Nu sunt servicii disponibile momentan.</p>}
+        {summary && <div className="queue-metrics"><div><strong>{summary.waitingCount}</strong><span>persoane în așteptare</span></div><div><strong>{summary.estimatedWaitMinutes === null ? '—' : `~${summary.estimatedWaitMinutes} min`}</strong><span>estimare orientativă</span></div></div>}
+        <p className="queue-note">Estimarea se poate schimba în funcție de ritmul de lucru la ghișee. Profilul de accesibilitate ales va fi folosit pentru traseu.</p>
+        <button className="primary request-ticket" disabled={loading || pending || Boolean(credentials) || !services.find((service) => service.id === serviceId)?.active}
           onClick={() => void visitorAction(async () => {
             const created = await api<CreatedQueueTicket>('/tickets', { method: 'POST', body: { serviceId, profile } });
             const saved = { id: created.id, accessToken: created.accessToken };
             remember(saved); setCredentials(saved); setTicket(created);
-          })}>{pending ? 'Se procesează…' : 'Ia un tichet'}</button>
+          })}>{pending ? 'Se creează tichetul…' : `Confirmă și ia tichet${services.length ? `ul ${services.find((service) => service.id === serviceId)?.prefix ?? ''}` : ''}`}</button>
       </div>
-      <div className="panel ticket-panel" aria-live="polite" aria-atomic="true">
-        {ticket ? <>
-          <span className="eyebrow">Tichetul tău · {services.find((s) => s.id === ticket.serviceId)?.name}</span>
-          <div className="ticket-number">{ticket.number}</div><span className={`ticket-status status-${ticket.status.toLowerCase()}`}>{STATUS[ticket.status]}</span>
-          {ticket.status === 'WAITING' && <p>Poziția <strong>{ticket.positionInQueue}</strong> · {ticket.visitorsAhead} persoane înaintea ta<br />{ticket.estimatedWaitMinutes === null ? 'Estimare indisponibilă' : `Așteptare aproximativă: ${ticket.estimatedWaitMinutes} min`}</p>}
-          {ticket.desk && ['CALLED', 'SERVING'].includes(ticket.status) && <div className="destination"><strong>{ticket.desk.name}</strong><span>{ticket.desk.floor === 0 ? 'Parter' : `Etaj ${ticket.desk.floor}`}</span><button className="primary" onClick={() => onNavigate(ticket)}>Arată traseul către ghișeu</button></div>}
-          {['WAITING', 'CALLED'].includes(ticket.status) && <button className="secondary" disabled={pending} onClick={() => void visitorAction(async () => {
-            setTicket(await api<QueueTicket>(`/tickets/${encodeURIComponent(ticket.id)}`, { method: 'DELETE', token: credentials?.accessToken }));
-          })}>Anulează tichetul</button>}
-          {terminal(ticket) && <button className="secondary" onClick={() => { remember(null); setCredentials(null); setTicket(null); }}>Alege un tichet nou</button>}
-        </> : <><span className="ticket-placeholder" aria-hidden="true">№</span><h3>{credentials ? 'Se recuperează tichetul…' : 'Tichetul tău apare aici'}</h3><p className="muted">{credentials ? 'Păstrează această pagină deschisă.' : 'Alege un serviciu și apasă „Ia un tichet”. Păstrează această pagină deschisă pentru actualizări.'}</p></>}
-      </div>
-    </div>
-    <details id="staff-panel" className="staff-panel"><summary>Panou personal · administrare ghișeu</summary>
+      <aside className="queue-howto"><span className="queue-howto__icon" aria-hidden="true">↗</span><span className="eyebrow">CUM FUNCȚIONEAZĂ</span><h3>Primești un loc la rând</h3><ol><li>Afișăm numărul și poziția ta în coadă.</li><li>Urmărești actualizările aici, pe ecran.</li><li>Când ești chemat, îți arătăm drumul către ghișeu.</li></ol><p>Nu închide pagina dacă vrei să urmărești starea tichetului.</p></aside>
+    </div> : <div className="ticket-tracking">
+      <section className="ticket-panel ticket-panel--active" aria-live="polite" aria-atomic="true">
+        <span className="ticket-panel__label">TICHETUL TĂU · {services.find((service) => service.id === ticket.serviceId)?.name}</span>
+        <div className="ticket-number">{ticket.number}</div><span className={`ticket-status status-${ticket.status.toLowerCase()}`}>{STATUS[ticket.status]}</span>
+        {ticket.status === 'WAITING' && <div className="ticket-position"><div><span>Poziția ta</span><strong>{ticket.positionInQueue ?? '—'}</strong></div><div><span>Înaintea ta</span><strong>{ticket.visitorsAhead}</strong></div><div><span>Timp estimat</span><strong>{ticket.estimatedWaitMinutes === null ? '—' : `~${ticket.estimatedWaitMinutes} min`}</strong></div></div>}
+        {ticket.desk && ['CALLED', 'SERVING'].includes(ticket.status) && <div className="destination"><strong>{ticket.desk.name}</strong><span>{ticket.desk.floor === 0 ? 'Parter' : `Etaj ${ticket.desk.floor}`}</span><button className="primary" onClick={() => onNavigate(ticket)}>Vezi traseul către ghișeu</button></div>}
+        {ticket.status === 'WAITING' && <p className="ticket-live-note"><span aria-hidden="true" /> Urmărește aici: poziția se actualizează automat. Te rugăm să rămâi aproape de ghișee.</p>}
+        {ticket.status === 'CALLED' && <p className="ticket-live-note ticket-live-note--called">Este rândul tău. Mergi la ghișeul indicat mai sus.</p>}
+        {ticket.status === 'SERVING' && <p className="ticket-live-note">Ești în curs de servire la ghișeul indicat.</p>}
+        {['WAITING', 'CALLED'].includes(ticket.status) && <button className="text-button ticket-cancel" disabled={pending} onClick={() => void visitorAction(async () => {
+          setTicket(await api<QueueTicket>(`/tickets/${encodeURIComponent(ticket.id)}`, { method: 'DELETE', token: credentials?.accessToken }));
+        })}>Anulează tichetul</button>}
+      </section>
+      <aside className="ticket-next-step"><span className="eyebrow">CE URMEAZĂ</span><h3>{ticket.status === 'WAITING' ? 'Așteaptă să fii chemat' : ticket.status === 'CALLED' ? 'Mergi către ghișeu' : 'Servirea a început'}</h3><p>{ticket.status === 'WAITING' ? 'Numărul tău va apărea aici când personalul te cheamă. Timpul afișat este orientativ și poate varia.' : ticket.desk ? `Ghișeul ${ticket.desk.name} · ${ticket.desk.floor === 0 ? 'Parter' : `Etajul ${ticket.desk.floor}`}.` : 'Urmărește actualizările tichetului pe acest ecran.'}</p>{ticket.status === 'CALLED' && <button className="secondary" onClick={() => onNavigate(ticket)}>Deschide harta <span aria-hidden="true">→</span></button>}</aside>
+    </div>}
+    </>}
+    {mode === 'staff' && <div className="dashboard-heading staff-heading"><div><span className="eyebrow">ZONĂ SECURIZATĂ · PERSONAL</span><h1 id="queue-heading">Administrare ghișeu</h1><p>Autentifică-te pentru a chema și gestiona următorul tichet.</p></div><span className="staff-secure-badge">♙ Acces personal</span></div>}
+    <details id="staff-panel" className={`staff-panel${mode === 'staff' ? ' staff-panel--page' : ''}`} open={mode === 'staff'}><summary>Panou personal · administrare ghișeu</summary>
       <form className="staff-login" onSubmit={(event) => { event.preventDefault(); setStaffKey(keyInput.trim()); setKeyInput(''); setStaffMessage(''); }}>
         <label htmlFor="staff-key">Cheie de acces personal</label><input id="staff-key" type="password" autoComplete="off" value={keyInput} onChange={(e) => setKeyInput(e.target.value)} placeholder="Cheia STAFF_API_KEY din .env" required />
         <button type="submit" className="secondary">Conectare</button>

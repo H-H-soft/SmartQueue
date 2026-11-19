@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import buildingData from './data/building.json';
 import type { AccessibilityProfile, Building, RouteStep } from './types';
 import { findRoute } from './routing/findRoute';
 import QueuePanel from './QueuePanel';
 import './App.css';
 import IndoorMap from './components/IndoorMap';
+import Icon from './components/Icon';
 
 const building = buildingData as unknown as Building;
 const places = building.nodes.filter((node) => node.label);
@@ -25,8 +26,12 @@ const PROFILES: { value: AccessibilityProfile; label: string }[] = [
 
 type AppView = 'overview' | 'queue' | 'map' | 'staff';
 const VIEW_LABELS: Record<AppView, string> = {
-  overview: 'Prezentare', queue: 'Tichete', map: 'Hartă interioară', staff: 'Personal',
+  overview: 'Acasă', queue: 'Tichetul meu', map: 'Orientare', staff: 'Personal',
 };
+function readView(): AppView {
+  const view = window.location.hash.slice(1);
+  return view === 'overview' || view === 'queue' || view === 'staff' ? view : 'map';
+}
 
 function speak(steps: RouteStep[]) {
   if (!('speechSynthesis' in window)) return;
@@ -41,18 +46,27 @@ function speak(steps: RouteStep[]) {
 
 export default function App() {
   const [from, setFrom] = useState(places[0].id);
-  const [to, setTo] = useState(places[places.length - 1].id);
+  const [to, setTo] = useState('');
   const [profile, setProfile] = useState<AccessibilityProfile>('wheelchair');
   const [floorId, setFloorId] = useState(building.floors[0]?.id ?? '');
   const [scanMessage, setScanMessage] = useState('');
-  const [activeView, setActiveView] = useState<AppView>('overview');
+  const [activeView, setActiveView] = useState<AppView>(readView);
+
+  useEffect(() => {
+    const syncView = () => setActiveView(readView());
+    window.addEventListener('popstate', syncView);
+    window.addEventListener('hashchange', syncView);
+    return () => {
+      window.removeEventListener('popstate', syncView);
+      window.removeEventListener('hashchange', syncView);
+    };
+  }, []);
 
   function navigateTo(view: AppView, targetId?: string) {
     setActiveView(view);
-    const element = document.getElementById(targetId ?? (view === 'overview' ? 'top' : view === 'queue' ? 'queue' : view === 'map' ? 'navigation' : 'staff-panel'));
-    if (view === 'staff' && element instanceof HTMLDetailsElement) element.open = true;
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (view === 'map') document.getElementById('navigation-heading')?.focus({ preventScroll: true });
+    window.history.pushState({}, '', `#${view}`);
+    if (targetId) window.setTimeout(() => document.getElementById(targetId)?.focus(), 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function selectStart(placeId: string) {
@@ -92,29 +106,39 @@ export default function App() {
         </div>
 
         <div className="location-card">
-          <span className="location-icon" aria-hidden="true">⌂</span>
-          <span><strong>Centrul civic</strong><small>Clădire principală</small></span>
+          <span className="location-icon"><Icon name="home" size={18} /></span>
+          <span><strong>{building.name}</strong><small>Hartă și servicii</small></span>
         </div>
 
         <nav className="app-nav" aria-label="Navigare aplicație">
-          <span className="nav-caption">MENIU PRINCIPAL</span>
-          <button type="button" className={activeView === 'overview' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'overview' ? 'page' : undefined} onClick={() => navigateTo('overview')}>
-            <span className="nav-icon" aria-hidden="true">⌂</span><span>Prezentare</span>
-          </button>
-          <button type="button" className={activeView === 'queue' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'queue' ? 'page' : undefined} onClick={() => navigateTo('queue')}>
-            <span className="nav-icon" aria-hidden="true">▤</span><span>Tichete</span>
-          </button>
-          <button type="button" className={activeView === 'map' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'map' ? 'page' : undefined} onClick={() => navigateTo('map')}>
-            <span className="nav-icon" aria-hidden="true">⌖</span><span>Hartă interioară</span>
-          </button>
-          <span className="nav-caption nav-caption--manage">GESTIONARE</span>
-          <button type="button" className={activeView === 'staff' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'staff' ? 'page' : undefined} onClick={() => navigateTo('staff')}>
-            <span className="nav-icon" aria-hidden="true">♙</span><span>Personal</span>
-          </button>
+          <div className="nav-group">
+            <span className="nav-caption">ORIENTARE</span>
+            <button type="button" className={activeView === 'map' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'map' ? 'page' : undefined} onClick={() => navigateTo('map')}>
+              <span className="nav-icon"><Icon name="map" /></span><span>Găsește un traseu</span>
+            </button>
+            <button type="button" className="app-nav__item nav-qr" onClick={() => void scanStart()}>
+              <span className="nav-icon"><Icon name="qr" /></span><span>Scanează cod QR</span>
+            </button>
+          </div>
+          <div className="nav-group">
+            <span className="nav-caption">PENTRU VIZITATORI</span>
+            <button type="button" className={activeView === 'overview' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'overview' ? 'page' : undefined} onClick={() => navigateTo('overview')}>
+              <span className="nav-icon"><Icon name="home" /></span><span>Prezentare</span>
+            </button>
+            <button type="button" className={activeView === 'queue' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'queue' ? 'page' : undefined} onClick={() => navigateTo('queue')}>
+              <span className="nav-icon"><Icon name="ticket" /></span><span>Tichete și rând</span>
+            </button>
+          </div>
+          <div className="nav-group nav-group--staff">
+            <span className="nav-caption">ADMINISTRARE</span>
+            <button type="button" className={activeView === 'staff' ? 'app-nav__item active' : 'app-nav__item'} aria-current={activeView === 'staff' ? 'page' : undefined} onClick={() => navigateTo('staff')}>
+              <span className="nav-icon"><Icon name="staff" /></span><span>Panou personal</span>
+            </button>
+          </div>
         </nav>
 
         <div className="sidebar-bottom">
-          <div className="accessibility-card"><span aria-hidden="true">◉</span><div><strong>Profil activ</strong><small>{PROFILES.find((item) => item.value === profile)?.label}</small></div><button type="button" aria-label="Alege profilul de accesibilitate" onClick={() => document.getElementById('accessibility-profile')?.focus()}>⌄</button></div>
+          <div className="accessibility-card"><span><Icon name="accessibility" size={17} /></span><div><strong>Profil de acces</strong><small>{PROFILES.find((item) => item.value === profile)?.label}</small></div><button type="button" aria-label="Alege profilul de accesibilitate" onClick={() => document.getElementById('accessibility-profile')?.focus()}>⌄</button></div>
           <div className="sidebar-user"><span className="user-avatar" aria-hidden="true">V</span><span><strong>Vizitator</strong><small>Sesiune locală</small></span><span className="user-menu-dots" aria-hidden="true">···</span></div>
         </div>
       </aside>
@@ -125,8 +149,8 @@ export default function App() {
           <div className="topbar-controls">
             <span className="environment-badge"><span aria-hidden="true" />Mediu demonstrativ</span>
             <label className="profile-picker" htmlFor="accessibility-profile">
-              <span className="profile-picker__icon" aria-hidden="true">◉</span>
-              <span className="profile-picker__label">Accesibilitate</span>
+              <span className="profile-picker__icon"><Icon name="accessibility" size={16} /></span>
+              <span className="profile-picker__label">Traseu pentru</span>
               <select id="accessibility-profile" value={profile} onChange={(event) => setProfile(event.target.value as AccessibilityProfile)} aria-label="Profil de accesibilitate">
                 {PROFILES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
               </select>
@@ -135,30 +159,33 @@ export default function App() {
         </header>
 
         <main id="top" className="app-content">
-          <section className="dashboard-heading" aria-labelledby="welcome-heading">
-            <div><span className="eyebrow">CENTRUL CIVIC · CLĂDIRE PRINCIPALĂ</span><h1 id="welcome-heading">Cu ce te putem ajuta?</h1><p>Alege o acțiune sau continuă de unde ai rămas.</p></div>
-            <button className="primary heading-action" type="button" onClick={() => navigateTo('queue')}><span aria-hidden="true">＋</span> Solicită tichet</button>
+          {activeView === 'overview' && <><section className="dashboard-heading" aria-labelledby="welcome-heading">
+            <div><span className="eyebrow">{building.name.toLocaleUpperCase('ro-RO')}</span><h1 id="welcome-heading">Orientare în clădire</h1><p>Alege locul unde vrei să ajungi. Traseul ține cont de profilul tău de acces.</p></div>
+            <button className="primary heading-action" type="button" onClick={() => navigateTo('map')}><Icon name="route" size={17} /> Planifică traseul</button>
           </section>
 
           <section className="quick-actions" aria-label="Acțiuni rapide">
-            <button className="quick-action" type="button" onClick={() => navigateTo('queue')}><span className="quick-action__icon quick-action__icon--mint" aria-hidden="true">▤</span><span className="quick-action__copy"><strong>Intră la rând</strong><small>Alege un serviciu și ia un tichet</small></span><span className="quick-action__arrow" aria-hidden="true">›</span></button>
-            <button className="quick-action" type="button" onClick={() => navigateTo('map')}><span className="quick-action__icon quick-action__icon--blue" aria-hidden="true">⌖</span><span className="quick-action__copy"><strong>Găsește un ghișeu</strong><small>Vezi traseul potrivit profilului tău</small></span><span className="quick-action__arrow" aria-hidden="true">›</span></button>
-            <button className="quick-action" type="button" onClick={() => void scanStart()}><span className="quick-action__icon quick-action__icon--amber" aria-hidden="true">▦</span><span className="quick-action__copy"><strong>Scanează cod QR</strong><small>Setează automat punctul de plecare</small></span><span className="quick-action__arrow" aria-hidden="true">›</span></button>
+            <button className="quick-action quick-action--primary" type="button" onClick={() => navigateTo('map')}><span className="quick-action__icon quick-action__icon--blue"><Icon name="map" /></span><span className="quick-action__copy"><strong>Planifică un traseu accesibil</strong><small>Alege plecarea și destinația în clădire</small></span><span className="quick-action__arrow"><Icon name="arrow" size={17} /></span></button>
+            <button className="quick-action" type="button" onClick={() => void scanStart()}><span className="quick-action__icon quick-action__icon--amber"><Icon name="qr" /></span><span className="quick-action__copy"><strong>Scanează codul QR</strong><small>Folosește codul de la intrare ca punct de plecare</small></span><span className="quick-action__arrow"><Icon name="arrow" size={17} /></span></button>
+            <button className="quick-action" type="button" onClick={() => navigateTo('queue')}><span className="quick-action__icon quick-action__icon--mint"><Icon name="ticket" /></span><span className="quick-action__copy"><strong>Tichet la ghișeu</strong><small>Solicită un număr și urmărește rândul</small></span><span className="quick-action__arrow"><Icon name="arrow" size={17} /></span></button>
           </section>
 
-          <QueuePanel profile={profile} onNavigate={(ticket) => {
+          <section className="overview-card" aria-labelledby="visit-heading"><div className="overview-card__title"><span className="overview-card__icon"><Icon name="info" size={18} /></span><div><span className="eyebrow">ORIENTARE PERSONALIZATĂ</span><h2 id="visit-heading">Traseu potrivit nevoilor tale</h2></div></div><p className="overview-help">Alege profilul de accesibilitate din bara de sus. Harta ține cont de el și îți oferă indicații scrise sau vocale, pas cu pas.</p></section>
+          </>}
+
+          {activeView === 'queue' && <QueuePanel mode="visitor" profile={profile} onNavigate={(ticket) => {
             if (!ticket.desk) return;
             setTo(ticket.desk.locationId);
             setProfile(ticket.profile);
-            navigateTo('map');
-          }} />
+            navigateTo('map', 'navigation-heading');
+          }} />}
 
-          <section id="navigation" className="navigation-section" aria-labelledby="navigation-heading">
-            <div className="navigation-heading-row"><div><span className="eyebrow">HARTĂ INTERACTIVĂ</span><h2 id="navigation-heading" tabIndex={-1}>Găsește-ți drumul</h2><p className="section-description">Alege plecarea și destinația pentru a vedea traseul accesibil.</p></div><span className="map-access-badge"><span aria-hidden="true">♿</span> Rute accesibile</span></div>
+          {activeView === 'map' && <section id="navigation" className="navigation-section" aria-labelledby="navigation-heading">
+            <div className="navigation-heading-row"><div><span className="eyebrow">ORIENTARE ACCESIBILĂ</span><h2 id="navigation-heading" tabIndex={-1}>Unde vrei să ajungi?</h2><p className="section-description">Alege destinația. Calculăm un traseu în funcție de profilul de acces selectat.</p></div><span className="map-access-badge"><Icon name="accessibility" size={17} />{PROFILES.find((item) => item.value === profile)?.label}</span></div>
 
             <div className="route-controls">
               <label htmlFor="route-start"><span className="control-caption">PUNCT DE PLECARE</span><select id="route-start" value={from} onChange={(event) => selectStart(event.target.value)}>{places.map((place) => <option key={place.id} value={place.id}>{place.label}</option>)}</select></label>
-              <label htmlFor="route-destination"><span className="control-caption">DESTINAȚIE</span><select id="route-destination" value={to} onChange={(event) => setTo(event.target.value)}>{places.map((place) => <option key={place.id} value={place.id}>{place.label}</option>)}</select></label>
+              <label htmlFor="route-destination"><span className="control-caption">DESTINAȚIE</span><select id="route-destination" value={to} onChange={(event) => setTo(event.target.value)}><option value="">Alege o destinație</option>{places.map((place) => <option key={place.id} value={place.id}>{place.label}</option>)}</select></label>
               <button className="secondary route-controls__scan" type="button" onClick={() => void scanStart()}><span aria-hidden="true">▦</span> Scanează cod QR</button>
             </div>
             {scanMessage && <p className="notice error" role="alert">{scanMessage}</p>}
@@ -180,8 +207,15 @@ export default function App() {
               return <p className="floor-transition" key={`${currentNode.id}-${nextNode.id}`}>Continuă folosind {currentNode.label ?? transition} către {nextFloor?.name ?? nextNode.floor}.</p>;
             })}
 
-            {route ? <section className="route-summary" aria-live="polite"><div className="route-summary-heading"><div><span className="eyebrow">TRASEUL RECOMANDAT</span><h3>{route.totalDistance} metri <span>·</span> {Math.round(route.estimatedSeconds / 60) || 1} min</h3></div>{'speechSynthesis' in window && <button className="secondary voice-button" type="button" onClick={() => speak(route.steps)}><span aria-hidden="true">◖))</span> Ascultă indicațiile</button>}</div><ol className="route-steps">{route.steps.map((step) => <li key={step.id}>{step.text}{step.landmark && <em> ({step.landmark})</em>}</li>)}</ol></section> : <p role="alert">Nu există traseu pentru acest profil între locațiile alese.</p>}
-          </section>
+            {route ? <section className="route-summary" aria-live="polite"><div className="route-summary-heading"><div><span className="eyebrow">TRASEUL RECOMANDAT</span><h3>{route.totalDistance} metri <span>·</span> {Math.round(route.estimatedSeconds / 60) || 1} min</h3></div>{'speechSynthesis' in window && <button className="secondary voice-button" type="button" onClick={() => speak(route.steps)}><span aria-hidden="true">◖))</span> Ascultă indicațiile</button>}</div><ol className="route-steps">{route.steps.map((step) => <li key={step.id}>{step.text}{step.landmark && <em> ({step.landmark})</em>}</li>)}</ol></section> : to ? <p className="route-unavailable" role="status">Nu am găsit un traseu pentru această destinație cu profilul selectat. Încearcă un alt punct de plecare sau profil de acces.</p> : <p className="route-empty" role="status">Alege o destinație ca să vezi traseul accesibil și indicațiile pas cu pas.</p>}
+          </section>}
+
+          {activeView === 'staff' && <QueuePanel mode="staff" profile={profile} onNavigate={(ticket) => {
+            if (!ticket.desk) return;
+            setTo(ticket.desk.locationId);
+            setProfile(ticket.profile);
+            navigateTo('map', 'navigation-heading');
+          }} />}
 
           <footer className="app-footer"><span>SmartQueue</span><span>Accesibilitate și autonomie, la fiecare pas.</span><span>© 2026</span></footer>
         </main>
