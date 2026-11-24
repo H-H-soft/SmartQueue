@@ -29,7 +29,8 @@ export function edgeCost(edge: Edge, profile: AccessibilityProfile): number | nu
   if (edge.status === 'out_of_service') return null;
 
   if (profile === 'wheelchair') {
-    if (!edge.stepFree || edge.mode === 'stairs') return null;
+    // Unknown geometry is not safe to advertise as a step-free route.
+    if (edge.stepFree !== true || edge.mode === 'stairs') return null;
     if (edge.minWidth !== undefined && edge.minWidth < WHEELCHAIR_MIN_WIDTH) return null;
     if (edge.slope !== undefined && edge.slope > WHEELCHAIR_MAX_SLOPE) return null;
   }
@@ -175,27 +176,37 @@ function turnDirection(prev: Vec, next: Vec): 'left' | 'right' | 'straight' | 'b
 function buildSteps(building: Building, nodePath: string[], edges: Edge[]): RouteStep[] {
   const nodes = new Map(building.nodes.map((n) => [n.id, n]));
   const floors = new Map(building.floors.map((f) => [f.id, f]));
-  const landmarkAt = (nodeId: string) =>
-    building.landmarks.find((l) => l.nodeId === nodeId)?.text;
 
   const steps: RouteStep[] = [];
   let nextId = 1;
   let walkDistance = 0;
   let walkEndNode = '';
+  let walkNodeIds: string[] = [nodePath[0]];
   let lastVec: Vec | null = null;
 
-  const flushWalk = () => {
+  const flushWalk = (until: 'turn' | 'transition' | 'destination' = 'destination') => {
     if (walkDistance <= 0) return;
-    const meters = Math.round(walkDistance);
+    const meters = Number(walkDistance.toFixed(2));
+    const nextTurnNumber = steps.length + 2;
+    const endNode = nodes.get(walkEndNode);
+    const endText = until === 'turn'
+      ? `până la ${endNode?.label ?? `virajul ${nextTurnNumber} marcat pe plan`}`
+      : until === 'transition'
+        ? 'până la următoarea schimbare de nivel'
+        : `până la ${endNode?.label ?? 'destinația selectată'}`;
     steps.push({
       id: nextId++,
       action: 'walk',
       distance: meters,
-      text: `Mergi înainte ${meters} metri`,
-      landmark: landmarkAt(walkEndNode),
+      text: steps.length === 0
+        ? `Pornește pe traseul marcat și mergi ${endText}`
+        : `Continuă pe traseul marcat ${endText}`,
+      landmark: until === 'turn' ? endNode?.label ?? `Virajul ${nextTurnNumber} marcat pe plan` : undefined,
       nodeId: walkEndNode,
+      pathNodeIds: [...walkNodeIds],
     });
     walkDistance = 0;
+    walkNodeIds = [walkEndNode];
   };
 
   for (let i = 0; i < edges.length; i++) {
@@ -208,7 +219,7 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
       edge.mode === 'stairs' ||
       (edge.mode === 'ramp' && a.floor !== b.floor)
     ) {
-      flushWalk();
+      flushWalk('transition');
       lastVec = null;
       const floorName = floors.get(b.floor)?.name ?? b.floor;
       const action = edge.mode;
@@ -224,6 +235,7 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
         toFloor: b.floor,
         nodeId: b.id,
       });
+      walkNodeIds = [b.id];
       continue;
     }
 
@@ -231,21 +243,23 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
     if (lastVec) {
       const dir = turnDirection(lastVec, vec);
       if (dir !== 'straight') {
-        flushWalk();
+        flushWalk('turn');
+        const turnNumber = steps.length + 1;
+        const turnLandmark = a.label ?? `virajul ${turnNumber} marcat pe plan`;
         steps.push({
           id: nextId++,
           action: 'turn',
           direction: dir,
-          text:
-            dir === 'left' ? 'Virează la stânga'
-            : dir === 'right' ? 'Virează la dreapta'
-            : 'Întoarce-te',
+          text: `${dir === 'left' ? 'Virează la stânga' : dir === 'right' ? 'Virează la dreapta' : 'Întoarce-te'} la ${turnLandmark}`,
+          landmark: turnLandmark,
           nodeId: a.id,
+          pathNodeIds: [a.id],
         });
       }
     }
     walkDistance += edge.distance;
     walkEndNode = b.id;
+    walkNodeIds.push(b.id);
     lastVec = vec;
   }
   flushWalk();
@@ -254,7 +268,7 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
   steps.push({
     id: nextId++,
     action: 'arrive',
-    text: `Ai ajuns la ${dest.label ?? 'destinație'}`,
+    text: 'Ai ajuns la destinația selectată',
     nodeId: dest.id,
   });
 

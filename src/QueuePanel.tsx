@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
+import { readAccountSession } from './account';
+import airiGroundFloor from './data/airi-ground-floor.json';
 import type { AccessibilityProfile, CreatedQueueTicket, QueueDeskSummary, QueueService, QueueSummary, QueueTicket, QueueTicketStatus } from './types';
 
 const STATUS: Record<QueueTicketStatus, string> = {
@@ -7,6 +9,8 @@ const STATUS: Record<QueueTicketStatus, string> = {
   COMPLETED: 'Finalizat', CANCELLED: 'Anulat', MISSED: 'Neprezentat',
 };
 const terminal = (ticket: QueueTicket) => ['COMPLETED', 'CANCELLED', 'MISSED'].includes(ticket.status);
+const floorPlan = airiGroundFloor;
+const normalizeText = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('ro-RO').trim();
 type Credentials = { id: string; accessToken: string };
 const storageKey = 'smartqueue.ticket';
 function restore(): Credentials | null {
@@ -53,6 +57,9 @@ export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
   const [summary, setSummary] = useState<QueueSummary | null>(null);
   const [credentials, setCredentials] = useState<Credentials | null>(restore);
   const [ticket, setTicket] = useState<QueueTicket | null>(null);
+  const deskIsOnPlan = Boolean(ticket?.desk && ticket.desk.buildingId === floorPlan.id &&
+    floorPlan.floors.some((floor) => floor.level === ticket.desk?.floor) &&
+    floorPlan.nodes.some((node) => node.id === ticket.desk?.locationId));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
@@ -84,7 +91,7 @@ export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
           serviceId ? api<QueueSummary>(`/queues/${encodeURIComponent(serviceId)}`) : null,
         ]);
         if (!live || current !== version) return;
-        setServices(catalogue); setDesks(deskList); setTicket(state); setSummary(queue); setError('');
+        setServices(catalogue); setDesks(deskList.filter((desk) => desk.buildingId === floorPlan.id)); setTicket(state); setSummary(queue); setError('');
       } catch (cause) {
         if (live && current === version) {
           const message = (cause as Error).message;
@@ -119,6 +126,27 @@ export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
     void refresh();
     return () => { live = false; socket.disconnect(); window.clearInterval(timer); };
   }, [credentials, serviceId]);
+
+  useEffect(() => {
+    if (mode !== 'visitor' || !services.length) return;
+    const selectRequestedService = (name: string) => {
+      const requested = services.find((item) => normalizeText(item.name) === normalizeText(name));
+      if (!requested) return false;
+      setSelectedService(requested.id);
+      try { sessionStorage.removeItem('smartqueue-pending-service'); } catch {}
+      return true;
+    };
+    try {
+      const pendingName = sessionStorage.getItem('smartqueue-pending-service');
+      if (pendingName) selectRequestedService(pendingName);
+    } catch { /* The user can still select a service manually. */ }
+    const onServiceRequest = (event: Event) => {
+      const name = (event as CustomEvent<{ name?: string }>).detail?.name;
+      if (name) selectRequestedService(name);
+    };
+    window.addEventListener('smartqueue-service-request', onServiceRequest);
+    return () => window.removeEventListener('smartqueue-service-request', onServiceRequest);
+  }, [mode, services]);
 
   useEffect(() => {
     if (!staffKey || !deskId) return;
@@ -160,7 +188,7 @@ export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
 
   return <section id={mode === 'visitor' ? 'queue' : 'staff-page'} className={`queue-section queue-page queue-page--${mode}`} aria-labelledby="queue-heading">
     {mode === 'visitor' && <>
-    <div className="section-heading"><div><span className="eyebrow">SERVICII ȘI PROGRAMĂRI</span><h2 id="queue-heading">{ticket && !terminal(ticket) ? 'Urmărește-ți rândul' : 'Solicită un tichet'}</h2><p className="section-description">{ticket && !terminal(ticket) ? 'Păstrează pagina deschisă pentru actualizări despre chemarea ta.' : 'Alege serviciul de care ai nevoie. Nu trebuie să oferi date personale.'}</p></div>
+    <div className="section-heading"><div><span className="eyebrow">SPRIJIN PENTRU VIZITATORI · AIRI</span><h2 id="queue-heading">{ticket && !terminal(ticket) ? 'Urmărește solicitarea' : 'Solicită sprijin'}</h2><p className="section-description">{ticket && !terminal(ticket) ? 'Păstrează pagina deschisă pentru actualizări despre tichet.' : 'Alege motivul solicitării. Nu trebuie să oferi date personale.'}</p></div>
       <span className={`connection ${connected ? 'online' : ''}`}>{connected ? 'Actualizare în timp real' : 'Actualizare periodică'}</span></div>
     {error && <p className="notice error" role="alert">{error} <button className="text-button" onClick={() => window.location.reload()}>Reîncarcă</button></p>}
     {ticket && terminal(ticket) ? <section className="ticket-finished" aria-live="polite">
@@ -177,45 +205,45 @@ export default function QueuePanel({ profile, onNavigate, mode = 'visitor' }: {
         <p className="queue-note">Estimarea se poate schimba în funcție de ritmul de lucru la ghișee. Profilul de accesibilitate ales va fi folosit pentru traseu.</p>
         <button className="primary request-ticket" disabled={loading || pending || Boolean(credentials) || !services.find((service) => service.id === serviceId)?.active}
           onClick={() => void visitorAction(async () => {
-            const created = await api<CreatedQueueTicket>('/tickets', { method: 'POST', body: { serviceId, profile } });
+            const created = await api<CreatedQueueTicket>('/tickets', { method: 'POST', body: { serviceId, profile }, token: readAccountSession()?.accessToken });
             const saved = { id: created.id, accessToken: created.accessToken };
             remember(saved); setCredentials(saved); setTicket(created);
           })}>{pending ? 'Se creează tichetul…' : `Confirmă și ia tichet${services.length ? `ul ${services.find((service) => service.id === serviceId)?.prefix ?? ''}` : ''}`}</button>
       </div>
-      <aside className="queue-howto"><span className="queue-howto__icon" aria-hidden="true">↗</span><span className="eyebrow">CUM FUNCȚIONEAZĂ</span><h3>Primești un loc la rând</h3><ol><li>Afișăm numărul și poziția ta în coadă.</li><li>Urmărești actualizările aici, pe ecran.</li><li>Când ești chemat, îți arătăm drumul către ghișeu.</li></ol><p>Nu închide pagina dacă vrei să urmărești starea tichetului.</p></aside>
+      <aside className="queue-howto"><span className="queue-howto__icon" aria-hidden="true">↗</span><span className="eyebrow">CUM FUNCȚIONEAZĂ</span><h3>Solicitarea ta ajunge în coada SmartQueue</h3><ol><li>Alegi „Ajutor pentru orientare” sau trimiți o întrebare despre vizită.</li><li>Primești un număr și urmărești poziția pe acest dispozitiv.</li><li>Când operatorul preia tichetul, verifici aici indicațiile lui.</li></ol><p>Punctul echipei nu este încă marcat pe planul parterului AIRI. Aplicația nu va inventa un traseu până acolo.</p></aside>
     </div> : <div className="ticket-tracking">
       <section className="ticket-panel ticket-panel--active" aria-live="polite" aria-atomic="true">
         <span className="ticket-panel__label">TICHETUL TĂU · {services.find((service) => service.id === ticket.serviceId)?.name}</span>
         <div className="ticket-number">{ticket.number}</div><span className={`ticket-status status-${ticket.status.toLowerCase()}`}>{STATUS[ticket.status]}</span>
         {ticket.status === 'WAITING' && <div className="ticket-position"><div><span>Poziția ta</span><strong>{ticket.positionInQueue ?? '—'}</strong></div><div><span>Înaintea ta</span><strong>{ticket.visitorsAhead}</strong></div><div><span>Timp estimat</span><strong>{ticket.estimatedWaitMinutes === null ? '—' : `~${ticket.estimatedWaitMinutes} min`}</strong></div></div>}
-        {ticket.desk && ['CALLED', 'SERVING'].includes(ticket.status) && <div className="destination"><strong>{ticket.desk.name}</strong><span>{ticket.desk.floor === 0 ? 'Parter' : `Etaj ${ticket.desk.floor}`}</span><button className="primary" onClick={() => onNavigate(ticket)}>Vezi traseul către ghișeu</button></div>}
-        {ticket.status === 'WAITING' && <p className="ticket-live-note"><span aria-hidden="true" /> Urmărește aici: poziția se actualizează automat. Te rugăm să rămâi aproape de ghișee.</p>}
-        {ticket.status === 'CALLED' && <p className="ticket-live-note ticket-live-note--called">Este rândul tău. Mergi la ghișeul indicat mai sus.</p>}
-        {ticket.status === 'SERVING' && <p className="ticket-live-note">Ești în curs de servire la ghișeul indicat.</p>}
+        {ticket.desk && ['CALLED', 'SERVING'].includes(ticket.status) && <div className="destination"><strong>{ticket.desk.name}</strong><span>{deskIsOnPlan ? (ticket.desk.floor === 0 ? 'Parter · punct marcat pe plan' : `Etaj ${ticket.desk.floor} · punct marcat pe plan`) : 'Punctul de întâlnire nu este marcat pe plan'}</span>{deskIsOnPlan && <button className="primary" onClick={() => onNavigate(ticket)}>Deschide planul parterului</button>}</div>}
+        {ticket.status === 'WAITING' && <p className="ticket-live-note"><span aria-hidden="true" /> Cererea este înregistrată. Vei vedea aici când operatorul SmartQueue preia tichetul.</p>}
+        {ticket.status === 'CALLED' && <p className="ticket-live-note ticket-live-note--called">Tichetul a fost preluat. Punctul echipei nu este încă marcat pe plan; cere operatorului indicații clare înainte să pornești.</p>}
+        {ticket.status === 'SERVING' && <p className="ticket-live-note">Solicitarea ta este în curs. Dacă ai nevoie de ghidaj, cere operatorului indicații pas cu pas.</p>}
         {['WAITING', 'CALLED'].includes(ticket.status) && <button className="text-button ticket-cancel" disabled={pending} onClick={() => void visitorAction(async () => {
           setTicket(await api<QueueTicket>(`/tickets/${encodeURIComponent(ticket.id)}`, { method: 'DELETE', token: credentials?.accessToken }));
         })}>Anulează tichetul</button>}
       </section>
-      <aside className="ticket-next-step"><span className="eyebrow">CE URMEAZĂ</span><h3>{ticket.status === 'WAITING' ? 'Așteaptă să fii chemat' : ticket.status === 'CALLED' ? 'Mergi către ghișeu' : 'Servirea a început'}</h3><p>{ticket.status === 'WAITING' ? 'Numărul tău va apărea aici când personalul te cheamă. Timpul afișat este orientativ și poate varia.' : ticket.desk ? `Ghișeul ${ticket.desk.name} · ${ticket.desk.floor === 0 ? 'Parter' : `Etajul ${ticket.desk.floor}`}.` : 'Urmărește actualizările tichetului pe acest ecran.'}</p>{ticket.status === 'CALLED' && <button className="secondary" onClick={() => onNavigate(ticket)}>Deschide harta <span aria-hidden="true">→</span></button>}</aside>
+      <aside className="ticket-next-step"><span className="eyebrow">CE URMEAZĂ</span><h3>{ticket.status === 'WAITING' ? 'Cererea ta este înregistrată' : ticket.status === 'CALLED' ? 'Operatorul a preluat tichetul' : 'Solicitarea este în curs'}</h3><p>{ticket.status === 'WAITING' ? 'Urmărește numărul, poziția și estimarea orientativă aici. Când operatorul actualizează tichetul, vei vedea schimbarea pe ecran.' : deskIsOnPlan ? `Punctul ${ticket.desk?.name} este marcat pe planul parterului. Traseul afișat rămâne estimativ și trebuie confirmat pe teren.` : 'Locația punctului de sprijin nu este încă verificată și marcată pe planul AIRI. Cere operatorului locul exact și indicații pas cu pas; nu urma un traseu estimativ ca pe unul confirmat.'}</p>{ticket.status === 'CALLED' && deskIsOnPlan && <button className="secondary" onClick={() => onNavigate(ticket)}>Deschide planul parterului <span aria-hidden="true">→</span></button>}</aside>
     </div>}
     </>}
-    {mode === 'staff' && <div className="dashboard-heading staff-heading"><div><span className="eyebrow">ZONĂ SECURIZATĂ · PERSONAL</span><h1 id="queue-heading">Administrare ghișeu</h1><p>Autentifică-te pentru a chema și gestiona următorul tichet.</p></div><span className="staff-secure-badge">♙ Acces personal</span></div>}
-    <details id="staff-panel" className={`staff-panel${mode === 'staff' ? ' staff-panel--page' : ''}`} open={mode === 'staff'}><summary>Panou personal · administrare ghișeu</summary>
+    {mode === 'staff' && <div className="dashboard-heading staff-heading"><div><span className="eyebrow">ZONĂ SECURIZATĂ · PERSONAL</span><h1 id="queue-heading">Administrare solicitări AIRI</h1><p>Autentifică-te pentru a prelua și gestiona cererile vizitatorilor.</p></div><span className="staff-secure-badge">♙ Acces personal</span></div>}
+    <details id="staff-panel" className={`staff-panel${mode === 'staff' ? ' staff-panel--page' : ''}`} open={mode === 'staff'}><summary>Panou operator · coada de sprijin</summary>
       <form className="staff-login" onSubmit={(event) => { event.preventDefault(); setStaffKey(keyInput.trim()); setKeyInput(''); setStaffMessage(''); }}>
         <label htmlFor="staff-key">Cheie de acces personal</label><input id="staff-key" type="password" autoComplete="off" value={keyInput} onChange={(e) => setKeyInput(e.target.value)} placeholder="Cheia STAFF_API_KEY din .env" required />
         <button type="submit" className="secondary">Conectare</button>
         {staffKey && <button type="button" className="text-button" onClick={() => { setStaffKey(''); setStaffVerified(''); setStaffTicket(null); setStaffError(''); setStaffMessage(''); }}>Deconectare</button>}
       </form>
       {staffError && <p className="notice error" role="alert">{staffError}</p>}
-      <div className="staff-controls"><label>Ghișeu<select value={deskId} onChange={(e) => { setSelectedDesk(e.target.value); setStaffMessage(''); }} disabled={staffLoading}>
-        {!desks.length && <option value="">Niciun ghișeu disponibil</option>}
+      <div className="staff-controls"><label>Echipă de sprijin<select value={deskId} onChange={(e) => { setSelectedDesk(e.target.value); setStaffMessage(''); }} disabled={staffLoading}>
+        {!desks.length && <option value="">Nicio echipă disponibilă</option>}
         {desks.map((d) => <option key={d.id} value={d.id}>{d.name} · {d.status === 'OPEN' ? 'deschis' : d.status === 'PAUSED' ? 'pauză' : 'închis'}</option>)}
       </select></label><label>Serviciu<select value={dispatchService} onChange={(e) => setStaffService(e.target.value)} disabled={staffLoading}>
         {desk?.services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
       </select></label></div>
       {staffKey && !staffReady && !staffError && <p role="status">Se verifică accesul…</p>}
       {staffReady && <>
-        <p role="status">{staffMessage || (staffTicket ? `Tichet curent: ${staffTicket.number} · ${STATUS[staffTicket.status]}` : 'Ghișeu liber.')}</p>
+        <p role="status">{staffMessage || (staffTicket ? `Tichet curent: ${staffTicket.number} · ${STATUS[staffTicket.status]}` : 'Nu există un tichet preluat momentan.')}</p>
         <div className="button-row"><button className="primary" disabled={staffLoading || pending || Boolean(staffTicket) || desk?.status !== 'OPEN' || !dispatchService}
           onClick={() => void staffAction(`/desks/${encodeURIComponent(deskId)}/call-next`, { serviceId: dispatchService })}>Cheamă următorul tichet</button>
           {staffTicket?.status === 'CALLED' && <><button className="secondary" disabled={staffLoading} onClick={() => void staffAction(`/tickets/${staffTicket.id}/status`, { status: 'SERVING' }, 'PATCH')}>Începe servirea</button><button className="secondary" disabled={staffLoading} onClick={() => void staffAction(`/tickets/${staffTicket.id}/status`, { status: 'MISSED' }, 'PATCH')}>Marchează neprezentat</button></>}

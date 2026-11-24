@@ -4,7 +4,7 @@ import { ZodError } from 'zod';
 import { createAuth } from './auth.js';
 import { apiRoutes } from './api.js';
 
-export function createApp({ service, staffKey, origin = 'http://localhost:5173', events, logger = console }) {
+export function createApp({ service, staffKey, origin = 'http://localhost:5173', events, logger = console, geminiApiKey, geminiModel }) {
   if (!staffKey || staffKey.length < 32 || staffKey.startsWith('replace-')) throw new Error('Configure a random STAFF_API_KEY of at least 32 characters.');
   const app = express();
   app.disable('x-powered-by');
@@ -20,7 +20,7 @@ export function createApp({ service, staffKey, origin = 'http://localhost:5173',
     catch (error) { logger.error('Realtime notification failed; REST state remains authoritative.', error); }
   };
   app.get('/health', (req, res) => res.json({ status: 'ok' }));
-  app.use('/api', apiRoutes(service, createAuth(service, staffKey), notify));
+  app.use('/api', apiRoutes(service, createAuth(service, staffKey), notify, { geminiApiKey, geminiModel }));
   app.use((req, res) => res.status(404).json({ error: { message: 'Endpoint not found.' } }));
   app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);

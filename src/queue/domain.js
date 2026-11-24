@@ -26,7 +26,7 @@ export function assertTransition(from, to) {
 export const activeStatuses = ['CALLED', 'SERVING'];
 
 export function publicTicket(ticket) {
-  const { tokenHash, ...safe } = ticket;
-  void tokenHash;
+  const { tokenHash, accountId, ...safe } = ticket;
+  void tokenHash; void accountId;
   return safe;
 }

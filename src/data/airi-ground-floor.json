@@ -1,0 +1,608 @@
+{
+  "id": "airi-utcn",
+  "name": "AIRI @ UTCN",
+  "source": {
+    "provider": "Matterport",
+    "modelId": "aCMSqhHHnKV",
+    "tourUrl": "https://my.matterport.com/show/?m=aCMSqhHHnKV",
+    "floorLabel": "Floor 1 · parterul clădirii",
+    "floorAreaSquareMeters": 2605,
+    "scanDate": "2026-11-15",
+    "accessibilityVerified": false,
+    "note": "Planul pereților este extras din geometria 3D a turului la înălțimea de 1,2 m. Pozițiile sunt coordonatele scanărilor Matterport. Traseele folosesc legături de navigare existente în tur; lungimea fiecărui segment este distanța geometrică dintre două scanări. Accesul fără trepte, lățimea ușilor și orientarea utilizatorului nu au fost confirmate la fața locului."
+  },
+  "floors": [
+    {
+      "id": "airi-ground",
+      "level": 0,
+      "name": "Parter · AIRI",
+      "plan": "/maps/airi-ground-floor.svg",
+      "width": 1000,
+      "height": 800,
+      "pixelsPerMeter": 10
+    }
+  ],
+  "nodes": [
+    {
+      "id": "scan-11",
+      "floor": "airi-ground",
+      "type": "entrance",
+      "x": 452.19,
+      "y": 482.8,
+      "label": "Intrarea principală · interior"
+    },
+    {
+      "id": "scan-12",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 451.62,
+      "y": 529.13
+    },
+    {
+      "id": "scan-13",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 451.21,
+      "y": 572.81
+    },
+    {
+      "id": "scan-14",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 451.56,
+      "y": 606.3
+    },
+    {
+      "id": "scan-15",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 506.95,
+      "y": 605.11
+    },
+    {
+      "id": "scan-16",
+      "floor": "airi-ground",
+      "type": "junction",
+      "x": 507.13,
+      "y": 630.71,
+      "label": "Ușă marcată cu simbol de accesibilitate"
+    },
+    {
+      "id": "scan-17",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 562.95,
+      "y": 605.92
+    },
+    {
+      "id": "scan-18",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 610.91,
+      "y": 606.26
+    },
+    {
+      "id": "scan-19",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 648,
+      "y": 606.67
+    },
+    {
+      "id": "scan-20",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 687.58,
+      "y": 607.04
+    },
+    {
+      "id": "scan-21",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 451.1,
+      "y": 644.74
+    },
+    {
+      "id": "scan-22",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 402.61,
+      "y": 644.47,
+      "label": "Ieșire · indicator EXIT"
+    },
+    {
+      "id": "scan-23",
+      "floor": "airi-ground",
+      "type": "waiting_area",
+      "x": 403.74,
+      "y": 572.42,
+      "label": "Gradenele atriumului"
+    },
+    {
+      "id": "scan-24",
+      "floor": "airi-ground",
+      "type": "junction",
+      "x": 403.76,
+      "y": 529.44,
+      "label": "Atrium"
+    },
+    {
+      "id": "scan-25",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 349.42,
+      "y": 529.64
+    },
+    {
+      "id": "scan-26",
+      "floor": "airi-ground",
+      "type": "elevator",
+      "x": 289.77,
+      "y": 528.95,
+      "label": "Lift"
+    },
+    {
+      "id": "scan-27",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 289.63,
+      "y": 551.34
+    },
+    {
+      "id": "scan-28",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 289.15,
+      "y": 605.61
+    },
+    {
+      "id": "scan-29",
+      "floor": "airi-ground",
+      "type": "desk",
+      "x": 334.63,
+      "y": 607.66,
+      "label": "Recepție · tejghea"
+    },
+    {
+      "id": "scan-30",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 332.56,
+      "y": 644.39
+    },
+    {
+      "id": "scan-31",
+      "floor": "airi-ground",
+      "type": "junction",
+      "x": 402.83,
+      "y": 605.63,
+      "label": "Turnicheții de acces"
+    },
+    {
+      "id": "scan-32",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 264.88,
+      "y": 551.66
+    },
+    {
+      "id": "scan-33",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 238.22,
+      "y": 550.8
+    },
+    {
+      "id": "scan-178",
+      "floor": "airi-ground",
+      "type": "junction",
+      "x": 281.23,
+      "y": 607.24,
+      "label": "Camera 105"
+    },
+    {
+      "id": "scan-179",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 263.97,
+      "y": 607.11
+    },
+    {
+      "id": "scan-180",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 190.17,
+      "y": 605.63
+    },
+    {
+      "id": "scan-181",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 190.97,
+      "y": 628.6
+    },
+    {
+      "id": "scan-182",
+      "floor": "airi-ground",
+      "type": "corridor",
+      "x": 135.1,
+      "y": 605.88
+    }
+  ],
+  "edges": [
+    {
+      "from": "scan-11",
+      "to": "scan-12",
+      "distance": 4.63,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-11",
+      "to": "scan-24",
+      "distance": 6.72,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-12",
+      "to": "scan-13",
+      "distance": 4.37,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-12",
+      "to": "scan-23",
+      "distance": 6.45,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-12",
+      "to": "scan-24",
+      "distance": 4.79,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-13",
+      "to": "scan-14",
+      "distance": 3.35,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-13",
+      "to": "scan-23",
+      "distance": 4.75,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-13",
+      "to": "scan-24",
+      "distance": 6.43,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-13",
+      "to": "scan-31",
+      "distance": 5.85,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-14",
+      "to": "scan-15",
+      "distance": 5.54,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-14",
+      "to": "scan-21",
+      "distance": 3.84,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-14",
+      "to": "scan-22",
+      "distance": 6.21,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-14",
+      "to": "scan-23",
+      "distance": 5.86,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-14",
+      "to": "scan-31",
+      "distance": 4.87,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-15",
+      "to": "scan-16",
+      "distance": 2.56,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-15",
+      "to": "scan-17",
+      "distance": 5.6,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-17",
+      "to": "scan-18",
+      "distance": 4.8,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-18",
+      "to": "scan-19",
+      "distance": 3.71,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-19",
+      "to": "scan-20",
+      "distance": 3.96,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-21",
+      "to": "scan-22",
+      "distance": 4.85,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-21",
+      "to": "scan-31",
+      "distance": 6.21,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-22",
+      "to": "scan-31",
+      "distance": 3.88,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-23",
+      "to": "scan-24",
+      "distance": 4.3,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-23",
+      "to": "scan-25",
+      "distance": 6.91,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-23",
+      "to": "scan-31",
+      "distance": 3.32,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-24",
+      "to": "scan-25",
+      "distance": 5.43,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-25",
+      "to": "scan-26",
+      "distance": 5.97,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-26",
+      "to": "scan-27",
+      "distance": 2.24,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-26",
+      "to": "scan-32",
+      "distance": 3.37,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-27",
+      "to": "scan-28",
+      "distance": 5.43,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-27",
+      "to": "scan-32",
+      "distance": 2.47,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-27",
+      "to": "scan-33",
+      "distance": 5.14,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-27",
+      "to": "scan-178",
+      "distance": 5.65,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-27",
+      "to": "scan-179",
+      "distance": 6.14,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-28",
+      "to": "scan-29",
+      "distance": 4.55,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-28",
+      "to": "scan-32",
+      "distance": 5.92,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-28",
+      "to": "scan-178",
+      "distance": 0.81,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-28",
+      "to": "scan-179",
+      "distance": 2.52,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-29",
+      "to": "scan-30",
+      "distance": 3.68,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-29",
+      "to": "scan-31",
+      "distance": 6.82,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-29",
+      "to": "scan-178",
+      "distance": 5.34,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-32",
+      "to": "scan-33",
+      "distance": 2.67,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-32",
+      "to": "scan-178",
+      "distance": 5.79,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-32",
+      "to": "scan-179",
+      "distance": 5.55,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-33",
+      "to": "scan-179",
+      "distance": 6.19,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-178",
+      "to": "scan-179",
+      "distance": 1.73,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-180",
+      "to": "scan-181",
+      "distance": 2.3,
+      "mode": "walk",
+      "stepFree": null
+    },
+    {
+      "from": "scan-180",
+      "to": "scan-182",
+      "distance": 5.51,
+      "mode": "walk",
+      "stepFree": null
+    }
+  ],
+  "landmarks": [
+    {
+      "nodeId": "scan-11",
+      "text": "Intrarea principală, în interiorul clădirii"
+    },
+    {
+      "nodeId": "scan-16",
+      "text": "Ușă cu simbol pentru utilizator de scaun rulant"
+    },
+    {
+      "nodeId": "scan-23",
+      "text": "Gradenele atriumului"
+    },
+    {
+      "nodeId": "scan-24",
+      "text": "Zona centrală a atriumului"
+    },
+    {
+      "nodeId": "scan-26",
+      "text": "Liftul de la parter"
+    },
+    {
+      "nodeId": "scan-29",
+      "text": "Tejgheaua de recepție"
+    },
+    {
+      "nodeId": "scan-31",
+      "text": "Turnicheții de acces"
+    },
+    {
+      "nodeId": "scan-178",
+      "text": "Camera 105"
+    },
+    {
+      "nodeId": "scan-22",
+      "text": "Ușă cu indicator luminos EXIT"
+    }
+  ]
+}
