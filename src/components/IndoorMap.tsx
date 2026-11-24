@@ -57,10 +57,10 @@ export default function IndoorMap({
       <div className="map-panel__heading">
         <div>
           <h3 id={headingId}>{floor.name}</h3>
-          <p>{route ? 'Traseul este evidențiat pe etajul selectat.' : 'Alege punctele de plecare și destinația pentru a vedea traseul.'}</p>
+          <p>{route ? 'Linia verde arată succesiunea estimată a scanărilor.' : 'Alege plecarea și sosirea ca să vezi traseul pe plan.'}</p>
         </div>
       </div>
-      <div className="map-scroll" role="group" aria-label={`Harta schematică pentru ${floor.name}`}>
+      <div className="map-scroll" role="group" aria-label={`Harta punctelor scanate pentru ${floor.name}`}>
       <svg
         viewBox={`0 0 ${floor.width} ${floor.height}`}
         role="img"
@@ -68,8 +68,8 @@ export default function IndoorMap({
         className="indoor-map"
       >
         <title id={titleId}>
-          {floor.name}: hartă schematică a coridoarelor și traseului selectat.
-          Instrucțiunile scrise sunt afișate sub hartă.
+          {floor.name}: plan schematic cu scanările clădirii și, dacă a fost calculat, traseul estimat.
+          Indicațiile scrise și vocale sunt afișate sub hartă.
         </title>
 
         <rect
@@ -81,10 +81,16 @@ export default function IndoorMap({
           rx="20"
         />
 
-        {corridors.map((edge) => {
+        {route && corridors.map((edge) => {
           const from = byId.get(edge.from);
           const to = byId.get(edge.to);
           if (!from || !to) return null;
+          if (route) {
+            const pathPairs = route.nodePath.slice(1).map((id, index) =>
+              new Set([route.nodePath[index], id]),
+            );
+            if (!pathPairs.some((pair) => pair.has(edge.from) && pair.has(edge.to))) return null;
+          }
 
           return (
             <line
@@ -109,10 +115,19 @@ export default function IndoorMap({
           />
         ))}
 
+        {!route && (
+          <text className="indoor-map__empty" x={floor.width / 2} y={floor.height / 2} textAnchor="middle">
+            {activeNodeId ? 'Alege destinația pentru a vedea traseul' : 'Alege plecarea și destinația pentru a vedea traseul'}
+          </text>
+        )}
+
         {nodes.map((node) => {
           const isStart = route?.from === node.id;
           const isEnd = route?.to === node.id;
           const isActive = activeNodeId === node.id;
+          const isOnRoute = Boolean(nodePath?.includes(node.id));
+          if (route && !isOnRoute) return null;
+          if (!route && node.id !== activeNodeId) return null;
           const anchor =
             node.x > floor.width - 130
               ? 'end'
@@ -135,28 +150,17 @@ export default function IndoorMap({
                 className={`indoor-map__node${isStart ? ' indoor-map__node--start' : ''}${isEnd ? ' indoor-map__node--destination' : ''}`}
                 cx={node.x}
                 cy={node.y}
-                r={node.label ? 10 : 5}
+                r={isStart || isEnd ? 11 : isActive ? 9 : isOnRoute ? 6 : 4}
               />
 
-              {node.label && (
+              {(isStart || isEnd || isActive) && (
                 <text
                   className="indoor-map__label"
                   x={node.x}
                   y={node.y - 26}
                   textAnchor={anchor}
                 >
-                  {node.label}
-                </text>
-              )}
-
-              {(isStart || isEnd) && (
-                <text
-                  className="indoor-map__endpoint"
-                  x={node.x}
-                  y={node.y + 30}
-                  textAnchor={anchor}
-                >
-                  {isStart && isEnd ? 'Start / Finish' : isStart ? 'Start' : 'Finish'}
+                  {!route ? 'PLECARE' : isStart && isEnd ? 'PLECARE / SOSIRE' : isStart ? 'PLECARE' : isEnd ? 'SOSIRE' : 'PAS CURENT'}
                 </text>
               )}
             </g>
@@ -165,8 +169,8 @@ export default function IndoorMap({
       </svg>
       </div>
       <ul className="map-legend" aria-label="Legendă hartă">
-        <li><span className="map-legend__swatch map-legend__swatch--route" aria-hidden="true" />Traseu accesibil</li>
-        <li><span className="map-legend__swatch map-legend__swatch--corridor" aria-hidden="true" />Coridor</li>
+        <li><span className="map-legend__swatch map-legend__swatch--route" aria-hidden="true" />Traseu estimat</li>
+        <li><span className="map-legend__swatch map-legend__swatch--corridor" aria-hidden="true" />Legătură scanată</li>
         <li><span className="map-legend__swatch map-legend__swatch--closed" aria-hidden="true" />Închis temporar</li>
       </ul>
     </section>

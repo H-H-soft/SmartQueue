@@ -29,7 +29,7 @@ export function edgeCost(edge: Edge, profile: AccessibilityProfile): number | nu
   if (edge.status === 'out_of_service') return null;
 
   if (profile === 'wheelchair') {
-    if (!edge.stepFree || edge.mode === 'stairs') return null;
+    if (edge.stepFree === false || edge.mode === 'stairs') return null;
     if (edge.minWidth !== undefined && edge.minWidth < WHEELCHAIR_MIN_WIDTH) return null;
     if (edge.slope !== undefined && edge.slope > WHEELCHAIR_MAX_SLOPE) return null;
   }
