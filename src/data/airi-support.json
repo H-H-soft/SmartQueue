@@ -1,0 +1,28 @@
+{
+  "buildingId": "airi-utcn",
+  "services": [
+    {
+      "id": "s1",
+      "name": "Ajutor pentru orientare",
+      "prefix": "A",
+      "avgMinutes": 5,
+      "active": true
+    },
+    {
+      "id": "s2",
+      "name": "Alte întrebări despre vizită",
+      "prefix": "I",
+      "avgMinutes": 4,
+      "active": true
+    }
+  ],
+  "desk": {
+    "id": "d1",
+    "name": "Echipa de sprijin SmartQueue",
+    "floor": 0,
+    "locationId": "airi-support-location-unverified",
+    "status": "OPEN",
+    "serviceIds": ["s1", "s2"]
+  },
+  "retiredDeskIds": ["d3"]
+}

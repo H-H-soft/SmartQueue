@@ -32,6 +32,30 @@ model Service {
   tickets    Ticket[]
 }
 
+model Account {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String
+  profile      String         @default("standard")
+  highContrast Boolean        @default(false)
+  largeText    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AccountSession[]
+  tickets      Ticket[]
+}
+
+model AccountSession {
+  id        String   @id @default(uuid())
+  accountId String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, expiresAt])
+}
+
 model Desk {
   id         String     @id @default(uuid())
   name       String
@@ -49,6 +73,8 @@ model Ticket {
   sequence  Int
   serviceId String
   service   Service      @relation(fields: [serviceId], references: [id])
+  accountId String?
+  account   Account?     @relation(fields: [accountId], references: [id], onDelete: SetNull)
   status    TicketStatus @default(WAITING)
   profile   String       @default("standard")
   tokenHash String
@@ -62,4 +88,5 @@ model Ticket {
   @@unique([serviceId, sequence])
   @@index([serviceId, status, sequence])
   @@index([deskId, status])
+  @@index([accountId, createdAt])
 }

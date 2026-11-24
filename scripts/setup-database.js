@@ -31,6 +31,23 @@ try {
       throw error;
     }
   }
+  const hasAccountTable = db.prepare(
+    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'Account'",
+  ).get();
+  if (!hasAccountTable) {
+    const migration = await readFile(
+      new URL('../prisma/migrations/20261122000000_accounts/migration.sql', import.meta.url),
+      'utf8',
+    );
+    db.exec('BEGIN');
+    try {
+      db.exec(migration);
+      db.exec('COMMIT');
+    } catch (error) {
+      db.exec('ROLLBACK');
+      throw error;
+    }
+  }
 } finally {
   db.close();
 }

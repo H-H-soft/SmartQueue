@@ -21,6 +21,17 @@ export function createQueueService(db) {
   };
 
   return {
+    findAccountByEmail: (email) => db.account.findUnique({ where: { email } }),
+    createAccount: (input) => db.account.create({ data: input }),
+    createAccountSession: (input) => db.accountSession.create({ data: input }),
+    findAccountSession: (tokenHash) => db.accountSession.findUnique({ where: { tokenHash }, include: { account: true } }),
+    deleteAccountSession: (tokenHash) => db.accountSession.deleteMany({ where: { tokenHash } }),
+    updateAccount: (id, input) => db.account.update({ where: { id }, data: input }),
+    accountTicketHistory: (accountId) => db.ticket.findMany({
+      where: { accountId }, orderBy: { createdAt: 'desc' }, take: 12,
+      select: { id: true, number: true, status: true, profile: true, createdAt: true,
+        service: { select: { name: true } }, desk: { select: { name: true, floor: true } } },
+    }),
     listServices: () => db.service.findMany({ select: {
       id: true, name: true, prefix: true, avgMinutes: true, active: true,
     }, orderBy: { id: 'asc' } }),

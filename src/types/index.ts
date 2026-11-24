@@ -27,6 +27,22 @@ export interface Floor {
   plan: string;      // calea către planul etajului (svg/png)
   width: number;     // dimensiunile planului, în unități ale hărții
   height: number;
+  pixelsPerMeter?: number;
+  outline?: MapPoint[];
+  areas?: MapArea[];
+}
+
+export interface MapPoint {
+  x: number;
+  y: number;
+}
+
+export interface MapArea {
+  id: string;
+  label: string;
+  kind: 'hallway' | 'unknown';
+  points: MapPoint[];
+  visualWidth?: number;
 }
 
 export interface GraphNode {
@@ -36,6 +52,8 @@ export interface GraphNode {
   x: number;
   y: number;
   label?: string;
+  areaId?: string;
+  areaLabel?: string;
   deskId?: string;   // doar pentru type = 'desk'
 }
 
@@ -85,6 +103,7 @@ export interface RouteStep {
   toFloor?: string;                // pentru 'elevator' / 'stairs' / 'ramp'
   landmark?: string;               // reper util, dacă există
   nodeId: string;                  // nodul în care se termină pasul
+  pathNodeIds?: string[];          // segmentul acestui pas, pentru evidențierea pe plan
 }
 
 export interface Route {
@@ -152,7 +171,7 @@ export interface QueueDesk {
   name: string;
   buildingId: string;
   floor: number;
-  locationId: string; // ID-ul nodului din Building.nodes, folosit de findRoute.
+  locationId: string; // Nod de pe plan sau ID marcat neverificat; se trasează doar dacă nodul există.
   status: 'OPEN' | 'PAUSED' | 'CLOSED';
 }
 
