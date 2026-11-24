@@ -12,6 +12,7 @@
 .indoor-map__node--start { fill: #e1b152; stroke: #8c6623; }
 .indoor-map__node--destination { fill: #188164; stroke: #0e6049; }
 .indoor-map__active-ring { fill: none; stroke: #bd8424; stroke-width: 4; }
+.indoor-map__empty { fill: #77857b; font-family: inherit; font-size: 20px; font-weight: 650; }
 .indoor-map__label,.indoor-map__endpoint { fill: #304239; font-family: inherit; font-size: 12px; font-weight: 700; }
 .indoor-map__label { stroke: #f8faf7; stroke-width: 4; paint-order: stroke; }
 .indoor-map__endpoint { fill: #fff; stroke: #315746; stroke-width: 3px; paint-order: stroke; font-size: 10px; }
@@ -29,4 +30,5 @@
   .indoor-map__node,.indoor-map__node--start,.indoor-map__node--destination { fill: Canvas; stroke: CanvasText; }
   .indoor-map__label,.indoor-map__endpoint { fill: CanvasText; stroke: Canvas; }
   .indoor-map__active-ring { fill: none; stroke: Highlight; }
+  .indoor-map__empty { fill: CanvasText; }
 }

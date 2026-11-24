@@ -46,7 +46,7 @@ export interface Edge {
   to: string;        // id nod (muchia e bidirecțională)
   distance: number;  // în metri
   mode: EdgeMode;
-  stepFree: boolean; // true = fără scări sau praguri
+  stepFree: boolean | null; // null = necunoscut; true/false trebuie confirmat în clădire
   minWidth?: number; // lățimea trecerii, în metri
   slope?: number;    // panta în procente, dacă e cazul
   status?: 'ok' | 'out_of_service'; // ex. lift defect
