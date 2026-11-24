@@ -544,3 +544,14 @@ input,select { min-height: 41px; margin: 6px 0 12px; padding: 8px 11px; border: 
   .route-step-list li { grid-template-columns: 28px minmax(0,1fr) auto; gap: 8px; padding: 8px; }
   .route-step-list li strong { font-size: .66rem; }
 }
+.floor-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.floor-switcher button { min-height: 44px; }
+.floor-switcher--map { margin: 20px 0 0; scroll-margin-top: 90px; }
+.floor-switcher--map + .map-panel { margin-top: 12px; }
+.floor-switcher button[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 3px; }
+.floor-two-plan { display: block; width: 100%; height: auto; margin: 20px 0; border: 1px solid #cfdad1; border-radius: 12px; }

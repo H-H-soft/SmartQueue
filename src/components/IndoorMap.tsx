@@ -163,6 +163,7 @@ function routeCamera(bounds: ReturnType<typeof pointsBounds>, routeNodes: GraphN
 export default function IndoorMap({ building, floorId, route, activeNodeId, startNodeId, destinationNodeId, currentStepIndex = 0, routeIsPreview = false, onNodeSelect, locationLabel }: Props) {
   const titleId = `map-${useId().replace(/:/g, '')}`;
   const [zoom, setZoom] = useState(1);
+  const [followDirection, setFollowDirection] = useState(false);
   const floor = building.floors.find((item) => item.id === floorId);
   const nodesById = useMemo(
     () => new Map(building.nodes.map((node) => [node.id, node])),
@@ -205,13 +206,13 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
     ?.map((id) => nodesById.get(id))
     .filter((node): node is GraphNode => node?.floor === floorId && connectedIds.has(node.id)) ?? [];
   const landmarks = mapNodes.filter((node) => node.label);
-  const bounds = useMemo(() => pointsBounds(mapNodes), [mapNodes]);
+  const bounds = floor?.overviewBounds ?? pointsBounds(floorNodes);
   const scaleLength = Math.round((floor?.pixelsPerMeter ?? 10) * 5);
   const lastConfirmedId = currentStepIndex > 0
     ? route?.steps[Math.min(currentStepIndex - 1, (route?.steps.length ?? 1) - 1)]?.nodeId
     : startNodeId ?? activeNodeId;
   const userPosition = nodesById.get(lastConfirmedId ?? '');
-  const camera = routeCamera(bounds, routeNodes, userPosition, zoom);
+  const camera = routeCamera(bounds, followDirection ? routeNodes : [], userPosition, zoom);
   const userPositionIndex = userPosition ? routeNodes.findIndex((node) => node.id === userPosition.id) : -1;
   const userNextNode = userPositionIndex >= 0 ? routeNodes[userPositionIndex + 1] : undefined;
   const userDirection = userNextNode
@@ -229,14 +230,15 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
     <section className="map-panel" aria-label={`Hartă GPS interioară: ${floor.name}`}>
       <header className="map-panel__heading">
         <div>
-          <span className="map-panel__kicker">HARTĂ GPS INTERIOARĂ · NIVEL 0</span>
+          <span className="map-panel__kicker">HARTĂ INTERIOARĂ · {floor.name}</span>
           <h3>{floor.name}</h3>
-          <p>{route ? 'Harta rotește drumul ca direcția următorului segment să fie mereu în sus.' : 'Alege reperul în care te afli și destinația; punctul albastru arată poziția selectată.'}</p>
+          <p>{followDirection && route ? 'Harta se rotește în direcția următorului segment.' : 'Vedere de ansamblu în orientarea fotografiei Matterport. Alege plecarea și destinația.'}</p>
         </div>
         <div className="map-zoom" role="group" aria-label="Mărire hartă">
           <button type="button" onClick={() => setZoom((value) => Math.min(MAX_ZOOM, value + ZOOM_STEP))} aria-label="Mărește harta">+</button>
           <button type="button" onClick={() => setZoom((value) => Math.max(MIN_ZOOM, value - ZOOM_STEP))} aria-label="Micșorează harta">−</button>
-          <button type="button" onClick={() => setZoom(1)} aria-label="Încadrează planul">Încadrează</button>
+          <button type="button" onClick={() => { setZoom(1); setFollowDirection(false); }} aria-label="Încadrează planul">Încadrează</button>
+          <button type="button" aria-pressed={followDirection} onClick={() => setFollowDirection((value) => !value)}>Urmărește direcția</button>
         </div>
       </header>
 
@@ -248,15 +250,12 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
           className="indoor-map"
           preserveAspectRatio="xMidYMid meet"
         >
-          <title id={titleId}>{floor.name}: rețeaua de legături a turului virtual și cele {landmarks.length} destinații recunoscute.</title>
-          <desc>Harta este decupată la zona conectată de la intrarea principală. Liniile arată conexiunile de navigare folosite pentru a ajunge la repere, iar contururile fine provin din geometria 3D. Lățimea reală a culoarelor nu este cunoscută.</desc>
+          <title id={titleId}>{floor.name}: rețeaua de legături și cele {landmarks.length} repere selectabile.</title>
+          <desc>{floor.distanceUnit === 'schematic' ? 'Plan orientativ după fotografii. Traseele urmează culoarele desenate și evită golurile centrale; pozițiile nu sunt măsurate.' : 'Vedere schematică a interiorului parterului după fotografia Matterport. Contururile fine provin din scanare.'}</desc>
           <defs>
             <pattern id={`${titleId}-grid`} width="20" height="20" patternUnits="userSpaceOnUse">
               <circle cx="1" cy="1" r="1" className="indoor-map__grid-dot" />
             </pattern>
-            <marker id={`${titleId}-arrow`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" className="indoor-map__arrow" />
-            </marker>
             <filter id={`${titleId}-shadow`} x="-30%" y="-30%" width="160%" height="160%">
               <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#18382a" floodOpacity=".2" />
             </filter>
@@ -300,15 +299,12 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               <polyline
                 className={`indoor-map__route-line${routeIsPreview ? ' is-preview' : ''}`}
                 points={pointsAttribute(routeNodes)}
-                markerMid={`url(#${titleId}-arrow)`}
-                markerEnd={`url(#${titleId}-arrow)`}
               />
             </>}
 
             {activePath.length > 1 && <polyline
               className="indoor-map__route-current"
               points={pointsAttribute(activePath)}
-              markerEnd={`url(#${titleId}-arrow)`}
               aria-hidden="true"
             />}
 
@@ -333,17 +329,35 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               </g>
               <text className="indoor-map__you-label" transform={`rotate(${-camera.rotation})`} x="0" y="39" textAnchor="middle">AICI</text>
             </g>}
+            {mapLandmarks.filter(({ node }) => node.floor === 'airi-ground' ? node.id === 'scan-178' : node.type === 'room').map(({ node, label }) => {
+              const upperDoor = node.id === 'f2-room-l103' || node.id === 'f2-room-l102';
+              const lines = (node.id === 'scan-178' ? '105' : label).split(' · ').flatMap(part => {
+                const wrapped: string[] = [];
+                for (const word of part.split(' ')) {
+                  const last = wrapped.length - 1;
+                  if (last < 0 || wrapped[last].length + word.length > 25) wrapped.push(word);
+                  else wrapped[last] += ` ${word}`;
+                }
+                return wrapped;
+              });
+              const x = node.x;
+              const above = upperDoor || node.id === 'scan-11';
+              const y = node.y + (above ? -16 - (lines.length - 1) * 11 : 24);
+              return <text key={`room-label-${node.id}`} className="indoor-map__room-label" x={x} y={y} textAnchor="middle">
+                {lines.map((line, index) => <tspan key={index} x={x} dy={index ? 11 : 0}>{line}</tspan>)}
+              </text>;
+            })}
           </g>
 
-          <g className="indoor-map__scale" transform={`translate(${bounds.x + 22} ${bounds.y + bounds.height - 20})`} aria-label="Bară de scară: 5 metri în coordonatele planului">
+          {floor.distanceUnit !== 'schematic' && <g className="indoor-map__scale" transform={`translate(${bounds.x + 22} ${bounds.y + bounds.height - 20})`} aria-label="Bară de scară: 5 metri în coordonatele planului">
             <line x1="0" y1="0" x2={scaleLength * camera.zoom} y2="0" />
             <line x1="0" y1="-5" x2="0" y2="5" />
             <line x1={scaleLength * camera.zoom} y1="-5" x2={scaleLength * camera.zoom} y2="5" />
             <text x={(scaleLength * camera.zoom) / 2} y="-8" textAnchor="middle">5 m · model</text>
-          </g>
+          </g>}
         </svg>
-        {route && userNextNode && <div className="map-direction-cue" aria-hidden="true"><span className="map-direction-cue__arrow">↑</span><span><strong>SUS = ÎNAINTE</strong><small>Harta se rotește pe direcția următorului segment</small></span></div>}
-        <div className="map-hud"><span><i />{userPosition ? `Ultimul reper: ${locationLabel?.(userPosition) ?? userPosition.label ?? 'poziție aleasă'}` : 'Alege punctul unde te afli'}</span><span>{mapNodes.length} puncte în tur · parter</span></div>
+        {followDirection && route && userNextNode && <div className="map-direction-cue" aria-hidden="true"><span className="map-direction-cue__arrow">↑</span><span><strong>SUS = ÎNAINTE</strong><small>Harta se rotește pe direcția următorului segment</small></span></div>}
+        <div className="map-hud"><span><i />{userPosition ? `Ultimul reper: ${locationLabel?.(userPosition) ?? userPosition.label ?? 'poziție aleasă'}` : 'Alege punctul unde te afli'}</span><span>{mapNodes.length} puncte · {floor.name}</span></div>
       </div>
 
       <div className="map-legend" aria-label="Legendă hartă">
@@ -352,11 +366,11 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
         {activePath.length > 1 && <span><i className="map-legend__swatch map-legend__swatch--current" />Segmentul indicației curente</span>}
         <span><i className="map-legend__pin map-legend__pin--start">●</i>Poziția aleasă / confirmată</span>
         <span><i className="map-legend__pin map-legend__pin--destination">D</i>Sosire</span>
-        <small>Benzile sunt simbolice; lățimea culoarelor nu este măsurată în tur.</small>
+        <small>{floor.distanceUnit === 'schematic' ? 'Schemă după fotografii; poziții aproximative, fără scară metrică.' : 'Schemă orientativă după fotografia Matterport; contururile fine provin din scanare.'} Lățimile și accesul nu sunt confirmate.</small>
       </div>
 
       <div className="map-places">
-        <div className="map-places__heading"><strong>Locuri de reper</strong><span>{mapLandmarks.length} destinații în tur</span></div>
+        <div className="map-places__heading"><strong>Locuri de reper</strong><span>{mapLandmarks.length} repere pe plan</span></div>
         <ol>
           {mapLandmarks.map(({ node, label, number }) => {
             const selected = node.id === startNodeId || node.id === destinationNodeId;
