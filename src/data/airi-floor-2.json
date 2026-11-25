@@ -1,0 +1,605 @@
+{
+  "id": "airi-utcn",
+  "name": "AIRI @ UTCN",
+  "floors": [
+    {
+      "id": "airi-floor-2",
+      "level": 1,
+      "name": "Etaj 1",
+      "plan": "/maps/airi-floor-2.svg",
+      "width": 1000,
+      "height": 420,
+      "distanceUnit": "schematic",
+      "overviewBounds": {
+        "x": 15,
+        "y": 30,
+        "width": 985,
+        "height": 380
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "f2-lifts",
+      "floor": "airi-floor-2",
+      "x": 399,
+      "y": 159,
+      "label": "Lifturi · hol central",
+      "type": "elevator"
+    },
+    {
+      "id": "f2-stone-stairs",
+      "floor": "airi-floor-2",
+      "x": 369,
+      "y": 207,
+      "type": "stairs"
+    },
+    {
+      "id": "f2-atrium-stairs",
+      "floor": "airi-floor-2",
+      "x": 468,
+      "y": 151,
+      "label": "Parcare",
+      "type": "stairs"
+    },
+    {
+      "id": "f2-hall-north",
+      "floor": "airi-floor-2",
+      "x": 420,
+      "y": 110,
+      "label": "Hol central · zona vitrată",
+      "type": "junction"
+    },
+    {
+      "id": "f2-hall",
+      "floor": "airi-floor-2",
+      "x": 420,
+      "y": 213,
+      "label": "Hol central · intersecție",
+      "type": "junction"
+    },
+    {
+      "id": "f2-hall-south",
+      "floor": "airi-floor-2",
+      "x": 390,
+      "y": 283,
+      "label": "Hol central · capăt sud",
+      "type": "junction"
+    },
+    {
+      "id": "f2-lift-junction",
+      "floor": "airi-floor-2",
+      "x": 420,
+      "y": 159,
+      "type": "junction"
+    },
+    {
+      "id": "f2-south-junction",
+      "floor": "airi-floor-2",
+      "x": 390,
+      "y": 213,
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-entry",
+      "floor": "airi-floor-2",
+      "x": 285,
+      "y": 205,
+      "label": "Aripa stângă · acces",
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-ne",
+      "floor": "airi-floor-2",
+      "x": 187,
+      "y": 183,
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-nw",
+      "floor": "airi-floor-2",
+      "x": 57,
+      "y": 183,
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-sw",
+      "floor": "airi-floor-2",
+      "x": 57,
+      "y": 289,
+      "label": "Aripa stângă · colț exterior",
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-se",
+      "floor": "airi-floor-2",
+      "x": 187,
+      "y": 289,
+      "label": "Aripa stângă · colț interior",
+      "type": "junction"
+    },
+    {
+      "id": "f2-west-junction",
+      "floor": "airi-floor-2",
+      "x": 187,
+      "y": 205,
+      "type": "junction"
+    },
+    {
+      "id": "f2-bridge",
+      "floor": "airi-floor-2",
+      "x": 600,
+      "y": 219,
+      "type": "junction"
+    },
+    {
+      "id": "f2-east-entry",
+      "floor": "airi-floor-2",
+      "x": 750,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-east-nw",
+      "floor": "airi-floor-2",
+      "x": 837,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-east-door-junction",
+      "floor": "airi-floor-2",
+      "x": 916,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-enclosed-stairs",
+      "floor": "airi-floor-2",
+      "x": 916,
+      "y": 223,
+      "label": "Ușă scară închisă · aripa dreaptă",
+      "type": "stairs"
+    },
+    {
+      "id": "f2-east-ne",
+      "floor": "airi-floor-2",
+      "x": 968,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-east-se",
+      "floor": "airi-floor-2",
+      "x": 968,
+      "y": 320,
+      "type": "junction"
+    },
+    {
+      "id": "f2-east-sw",
+      "floor": "airi-floor-2",
+      "x": 837,
+      "y": 320,
+      "type": "junction"
+    },
+    {
+      "id": "f2-s108-junction",
+      "floor": "airi-floor-2",
+      "x": 510,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-s109-junction",
+      "floor": "airi-floor-2",
+      "x": 650,
+      "y": 218,
+      "type": "junction"
+    },
+    {
+      "id": "f2-s110-junction",
+      "floor": "airi-floor-2",
+      "x": 700,
+      "y": 217,
+      "type": "junction"
+    },
+    {
+      "id": "f2-l103-junction",
+      "floor": "airi-floor-2",
+      "x": 775,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-l102-junction",
+      "floor": "airi-floor-2",
+      "x": 890,
+      "y": 216,
+      "type": "junction"
+    },
+    {
+      "id": "f2-room-s108",
+      "floor": "airi-floor-2",
+      "x": 510,
+      "y": 229,
+      "label": "S 108",
+      "type": "room"
+    },
+    {
+      "id": "f2-room-s109",
+      "floor": "airi-floor-2",
+      "x": 650,
+      "y": 232,
+      "label": "S 109",
+      "type": "room"
+    },
+    {
+      "id": "f2-room-s110",
+      "floor": "airi-floor-2",
+      "x": 700,
+      "y": 232,
+      "label": "S 110",
+      "type": "room"
+    },
+    {
+      "id": "f2-room-l103",
+      "floor": "airi-floor-2",
+      "x": 775,
+      "y": 202,
+      "label": "L 103 · Vodafone Innovation Hub",
+      "type": "room"
+    },
+    {
+      "id": "f2-room-l102",
+      "floor": "airi-floor-2",
+      "x": 890,
+      "y": 202,
+      "label": "L 102",
+      "type": "room"
+    },
+    {
+      "id": "f2-room-l101",
+      "floor": "airi-floor-2",
+      "x": 977,
+      "y": 240,
+      "label": "L 101",
+      "type": "room"
+    }
+  ],
+  "edges": [
+    {
+      "from": "f2-lifts",
+      "to": "f2-lift-junction",
+      "distance": 21,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-stone-stairs",
+      "to": "f2-south-junction",
+      "distance": 21.840329667841555,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-atrium-stairs",
+      "to": "f2-lift-junction",
+      "distance": 48.66210024238575,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-hall-north",
+      "to": "f2-lift-junction",
+      "distance": 49,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-lift-junction",
+      "to": "f2-hall",
+      "distance": 54,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-hall",
+      "to": "f2-south-junction",
+      "distance": 30,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-south-junction",
+      "to": "f2-hall-south",
+      "distance": 70,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-south-junction",
+      "to": "f2-west-entry",
+      "distance": 105.30432089900204,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-entry",
+      "to": "f2-west-junction",
+      "distance": 98,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-junction",
+      "to": "f2-west-ne",
+      "distance": 22,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-ne",
+      "to": "f2-west-nw",
+      "distance": 130,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-nw",
+      "to": "f2-west-sw",
+      "distance": 106,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-sw",
+      "to": "f2-west-se",
+      "distance": 130,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-west-se",
+      "to": "f2-west-junction",
+      "distance": 84,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-hall",
+      "to": "f2-s108-junction",
+      "distance": 90.0499861188218,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s108-junction",
+      "to": "f2-bridge",
+      "distance": 90.0499861188218,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-bridge",
+      "to": "f2-s109-junction",
+      "distance": 50.00999900019995,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s109-junction",
+      "to": "f2-s110-junction",
+      "distance": 50.00999900019995,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s110-junction",
+      "to": "f2-east-entry",
+      "distance": 50.00999900019995,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-entry",
+      "to": "f2-l103-junction",
+      "distance": 25,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-l103-junction",
+      "to": "f2-east-nw",
+      "distance": 62,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-nw",
+      "to": "f2-l102-junction",
+      "distance": 53,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-l102-junction",
+      "to": "f2-east-door-junction",
+      "distance": 26,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-door-junction",
+      "to": "f2-enclosed-stairs",
+      "distance": 7,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-door-junction",
+      "to": "f2-east-ne",
+      "distance": 52,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-ne",
+      "to": "f2-east-se",
+      "distance": 104,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-se",
+      "to": "f2-east-sw",
+      "distance": 131,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-sw",
+      "to": "f2-east-nw",
+      "distance": 104,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s108-junction",
+      "to": "f2-room-s108",
+      "distance": 13,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s109-junction",
+      "to": "f2-room-s109",
+      "distance": 14,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-s110-junction",
+      "to": "f2-room-s110",
+      "distance": 15,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-l103-junction",
+      "to": "f2-room-l103",
+      "distance": 14,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-l102-junction",
+      "to": "f2-room-l102",
+      "distance": 14,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "f2-east-ne",
+      "to": "f2-room-l101",
+      "distance": 25.63201123595259,
+      "mode": "walk",
+      "stepFree": null,
+      "wheelchairAllowedByUser": true
+    }
+  ],
+  "landmarks": [
+    {
+      "nodeId": "f2-lifts",
+      "text": "Lifturi · hol central"
+    },
+    {
+      "nodeId": "f2-atrium-stairs",
+      "text": "Parcare"
+    },
+    {
+      "nodeId": "f2-hall-north",
+      "text": "Hol central · zona vitrată"
+    },
+    {
+      "nodeId": "f2-hall",
+      "text": "Hol central · intersecție"
+    },
+    {
+      "nodeId": "f2-hall-south",
+      "text": "Hol central · capăt sud"
+    },
+    {
+      "nodeId": "f2-west-entry",
+      "text": "Aripa stângă · acces"
+    },
+    {
+      "nodeId": "f2-west-sw",
+      "text": "Aripa stângă · colț exterior"
+    },
+    {
+      "nodeId": "f2-west-se",
+      "text": "Aripa stângă · colț interior"
+    },
+    {
+      "nodeId": "f2-enclosed-stairs",
+      "text": "Ușă scară închisă · aripa dreaptă"
+    },
+    {
+      "nodeId": "f2-room-s108",
+      "text": "S 108"
+    },
+    {
+      "nodeId": "f2-room-s109",
+      "text": "S 109"
+    },
+    {
+      "nodeId": "f2-room-s110",
+      "text": "S 110"
+    },
+    {
+      "nodeId": "f2-room-l103",
+      "text": "L 103 · Vodafone Innovation Hub"
+    },
+    {
+      "nodeId": "f2-room-l102",
+      "text": "L 102"
+    },
+    {
+      "nodeId": "f2-room-l101",
+      "text": "L 101"
+    }
+  ]
+}

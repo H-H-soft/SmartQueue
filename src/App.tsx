@@ -225,7 +225,7 @@ export default function App() {
           <QueuePanel visible={activeView === 'queue' || activeView === 'staff'} mode={activeView === 'staff' ? 'staff' : 'visitor'} profile={profile} requesterLocationId={guidanceStart} onAdminChange={setAdminName} onOpenAdmin={() => navigateTo('staff')} onLocateRequester={(locationId, ticketProfile) => {
             setSelectedDesk(null); setGuidanceDestination(locationId); setProfile(ticketProfile); navigateTo('guidance');
           }} onNavigate={showDesk} />
-          {activeView === 'guidance' && <GuidancePage desk={selectedDesk} profile={profile} profileLabel={currentProfile.label} startId={guidanceStart} destinationId={guidanceDestination} setStartId={setGuidanceStart} setDestinationId={setGuidanceDestination} goToQueue={() => navigateTo('queue')} />}
+          {activeView === 'guidance' && <GuidancePage desk={selectedDesk} profile={profile} startId={guidanceStart} destinationId={guidanceDestination} setStartId={setGuidanceStart} setDestinationId={setGuidanceDestination} goToQueue={() => navigateTo('queue')} />}
           {activeView === 'accessibility' && <AccessibilityPage profile={profile} setProfile={setProfile} highContrast={highContrast} setHighContrast={setHighContrast} largeText={largeText} setLargeText={setLargeText} />}
           {activeView === 'account' && <AccountPage account={account} tickets={accountTickets} loadingTickets={loadingAccountTickets} busy={accountBusy} error={accountError} onAuthenticate={authenticate} onLogout={() => void logout()} goToAccessibility={() => navigateTo('accessibility')} />}
           <footer className="app-footer"><span>SmartQueue</span><span>Accesibilitate și autonomie, la fiecare pas.</span><span>© 2026</span></footer>
@@ -254,8 +254,8 @@ function HomePage({ goTo }: { goTo: (view: AppView) => void }) {
   </>;
 }
 
-function GuidancePage({ desk, profile, profileLabel, startId, destinationId, setStartId, setDestinationId, goToQueue }: {
-  desk: QueueTicket['desk']; profile: AccessibilityProfile; profileLabel: string;
+function GuidancePage({ desk, profile, startId, destinationId, setStartId, setDestinationId, goToQueue }: {
+  desk: QueueTicket['desk']; profile: AccessibilityProfile;
   startId: string; destinationId: string; setStartId: (value: string) => void;
   setDestinationId: (value: string) => void; goToQueue: () => void;
 }) {
@@ -338,15 +338,15 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
   }
 
   return <section className="guidance-page guidance-page--map" aria-labelledby="page-heading">
-    <div className="dashboard-heading"><div><span className="eyebrow">TURUL VIRTUAL AIRI · {floor.name}</span><h1 id="page-heading" tabIndex={-1}>Găsește drumul</h1><p>Alege plecarea și destinația pentru a calcula automat cel mai scurt traseu disponibil pe hartă.</p></div><span className="profile-context"><Icon name="accessibility" size={17} /> {profileLabel}</span></div>
-    {schematic && <p className="route-data-note">Floor 2: trasee orientative după fotografii, calculate pe culoarele desenate. Pozițiile sunt aproximative; distanțele în metri nu sunt cunoscute. Reperele scărilor indică palierele și ușile, nu schimbă automat etajul.</p>}
+    <div className="dashboard-heading"><div><span className="eyebrow">TURUL VIRTUAL AIRI · {floor.name}</span><h1 id="page-heading" tabIndex={-1}>Găsește drumul</h1><p>Alege plecarea și destinația pentru a calcula automat cel mai scurt traseu disponibil pe hartă.</p></div></div>
+    {schematic && <p className="route-data-note">Etaj 1: trasee orientative după fotografii, calculate pe culoarele desenate. Pozițiile sunt aproximative; distanțele în metri nu sunt cunoscute. Reperele scărilor indică palierele și ușile, nu schimbă automat etajul.</p>}
     {profile === 'wheelchair' && <p className="route-info">Toate culoarele cartografiate sunt activate pentru calculul traseelor în scaun rulant. Scările sunt excluse; accesibilitatea fizică nu este verificată.</p>}
-    {desk && <div className="destination-card"><span className="destination-card__icon"><Icon name="staff" size={21} /></span><div><span className="eyebrow">DESTINAȚIA TICHETULUI TĂU</span><strong>{desk.name}</strong><p>{desk.floor === 0 ? 'Parter' : `Etajul ${desk.floor}`}</p></div><span className={`desk-status desk-status--${desk.status.toLowerCase()}`}>{desk.status === 'OPEN' ? 'Deschis' : desk.status === 'PAUSED' ? 'Pauză' : 'Închis'}</span></div>}
+    {desk && <div className="destination-card"><span className="destination-card__icon"><Icon name="staff" size={21} /></span><div><span className="eyebrow">DESTINAȚIA TICHETULUI TĂU</span><strong>{desk.name}</strong><p>{desk.floor === 0 ? 'Parter' : `Etaj ${desk.floor}`}</p></div><span className={`desk-status desk-status--${desk.status.toLowerCase()}`}>{desk.status === 'OPEN' ? 'Deschis' : desk.status === 'PAUSED' ? 'Pauză' : 'Închis'}</span></div>}
 
     <div className="route-planner">
-      <label className="route-planner__field"><span>PLECARE</span><select value={startId} onChange={(event) => setStartId(event.target.value)} aria-label="Punctul de plecare"><option value="">Alege reperul de lângă tine</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={`Floor ${group.floor.level + 1} - ${group.floor.name}`}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
+      <label className="route-planner__field"><span>PLECARE</span><select value={startId} onChange={(event) => setStartId(event.target.value)} aria-label="Punctul de plecare"><option value="">Alege reperul de lângă tine</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={group.floor.name}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
       <button type="button" className="route-swap" aria-label="Inversează plecarea și destinația" disabled={!startId || !activeDestination} onClick={() => { setStartId(activeDestination); setDestinationId(startId); }}>⇅</button>
-      <label className="route-planner__field"><span>DESTINAȚIE</span><select value={destinationId || (deskMatchesFloor ? desk!.locationId : '')} onChange={(event) => setDestinationId(event.target.value)} aria-label="Punctul de sosire"><option value="">Alege unde vrei să ajungi</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={`Floor ${group.floor.level + 1} - ${group.floor.name}`}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
+      <label className="route-planner__field"><span>DESTINAȚIE</span><select value={destinationId || (deskMatchesFloor ? desk!.locationId : '')} onChange={(event) => setDestinationId(event.target.value)} aria-label="Punctul de sosire"><option value="">Alege unde vrei să ajungi</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={group.floor.name}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
       <button type="button" className="route-clear" disabled={!startId && !destinationId} onClick={() => { setStartId(''); setDestinationId(''); }}>Resetează</button>
     </div>
     {desk && !deskMatchesFloor && <p className="route-info" role="status">Punctul acestui tichet nu este înregistrat pe plan, deci nu pot calcula un traseu până la el. Cere operatorului locul exact. Poți alege separat o plecare și o destinație marcate pe plan.</p>}
@@ -366,13 +366,13 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
       <small>Urmează traseul marcat; punctul albastru se mută când confirmi că ai ajuns la reper. Previzualizările neverificate sunt desenate punctat.</small>
       <div>
         <button type="button" className="secondary" onClick={() => speak(currentRouteStep.text)}>Repetă indicația</button>
-        <button type="button" className="primary" disabled={currentStepIndex >= route.steps.length - 1} onClick={() => { const next = Math.min(currentStepIndex + 1, route.steps.length - 1); if (currentRouteStep.toFloor) setVisibleFloor(currentRouteStep.toFloor === 'airi-ground' ? 1 : 2); setCurrentStep(next); speak(route.steps[next].text); }}>{currentRouteStep.toFloor ? `Am ajuns pe Floor ${currentRouteStep.toFloor === 'airi-ground' ? 1 : 2}` : 'Am ajuns la reper'} <Icon name="arrow" size={15} /></button>
+        <button type="button" className="primary" disabled={currentStepIndex >= route.steps.length - 1} onClick={() => { const next = Math.min(currentStepIndex + 1, route.steps.length - 1); if (currentRouteStep.toFloor) setVisibleFloor(currentRouteStep.toFloor === 'airi-ground' ? 1 : 2); setCurrentStep(next); speak(route.steps[next].text); }}>{currentRouteStep.toFloor ? currentRouteStep.toFloor === 'airi-ground' ? 'Am ajuns la parter' : 'Am ajuns la etaj 1' : 'Am ajuns la reper'} <Icon name="arrow" size={15} /></button>
       </div>
     </section>}
 
     <div ref={floorControlsRef} className="floor-switcher floor-switcher--map" role="group" aria-label="Alege etajul afișat">
-      <button type="button" className={visibleFloor === 1 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 1} onClick={() => { setVisibleFloor(1); window.speechSynthesis?.cancel(); }}>Floor 1 · Parter</button>
-      <button type="button" className={visibleFloor === 2 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 2} onClick={() => { setVisibleFloor(2); window.speechSynthesis?.cancel(); }}>Floor 2 · Etajul 1</button>
+      <button type="button" className={visibleFloor === 1 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 1} onClick={() => { setVisibleFloor(1); window.speechSynthesis?.cancel(); }}>Parter</button>
+      <button type="button" className={visibleFloor === 2 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 2} onClick={() => { setVisibleFloor(2); window.speechSynthesis?.cancel(); }}>Etaj 1</button>
     </div>
     <IndoorMap key={floor.id} building={building} floorId={floor.id} route={route} currentStepIndex={currentStepIndex} activeNodeId={currentRouteStep?.nodeId} startNodeId={startId || undefined} destinationNodeId={activeDestination || undefined} routeIsPreview={accessibilityUnconfirmed || schematic} onNodeSelect={(nodeId) => { if (!startId) setStartId(nodeId); else if (!destinationId) setDestinationId(nodeId); else setDestinationId(nodeId); }} locationLabel={(node) => locations.find((item) => item.node.id === node.id)?.label ?? node.label ?? 'Reper de orientare'} />
 

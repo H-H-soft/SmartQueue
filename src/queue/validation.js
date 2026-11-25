@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { readFileSync } from 'node:fs';
 
-const building = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const groundFloor = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const upperFloor = JSON.parse(readFileSync(new URL('../data/airi-floor-2.json', import.meta.url), 'utf8'));
+const building = { ...groundFloor, floors: [...groundFloor.floors, ...upperFloor.floors], nodes: [...groundFloor.nodes, ...upperFloor.nodes] };
 const location = z.string().refine((value) => building.nodes.some((node) => node.id === value && node.label?.trim()), 'Alege un reper numit din plan, nu un punct tehnic de scanare.');
 
 const id = z.string().trim().min(1).max(100);
@@ -27,7 +29,7 @@ export const schemas = {
   call: z.object({ serviceId: id }).strict(),
   status: z.object({ status: z.enum(['SERVING', 'COMPLETED', 'MISSED']) }).strict(),
   reassign: z.object({ deskId: id }).strict(),
-  assistant: z.object({ question: z.string().trim().min(2).max(500), consent: z.literal(true),
+  assistant: z.object({ question: z.string().trim().min(1).max(500), consent: z.literal(true),
     history: z.array(z.object({ role: z.enum(['user', 'model']), text: z.string().min(1).max(1200) }).strict()).max(6).optional(),
     route: z.object({
       floor: z.string().max(80), origin: z.string().max(180), destination: z.string().max(180),

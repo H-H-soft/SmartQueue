@@ -3,7 +3,9 @@ import { estimateWait } from './estimationService.js';
 import { activeStatuses, assertTransition, fail, hashToken, newToken, publicTicket } from './domain.js';
 import { readFileSync } from 'node:fs';
 
-const building = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const groundFloor = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const upperFloor = JSON.parse(readFileSync(new URL('../data/airi-floor-2.json', import.meta.url), 'utf8'));
+const building = { ...groundFloor, floors: [...groundFloor.floors, ...upperFloor.floors], nodes: [...groundFloor.nodes, ...upperFloor.nodes] };
 const claimant = { select: { id: true, name: true, expiresAt: true, revokedAt: true } };
 const pendingStatuses = ['WAITING', 'CALLED', 'SERVING'];
 function withLocation(ticket) {
@@ -11,7 +13,7 @@ function withLocation(ticket) {
   const floor = building.floors.find((item) => item.id === node?.floor);
   return { ...publicTicket(ticket), requesterLocation: node ? {
     id: node.id, name: node.label ?? node.id, buildingId: building.id, buildingName: building.name,
-    floorId: node.floor, floor: floor?.level, floorName: floor?.name, x: node.x, y: node.y,
+    floorId: node.floor, floor: floor?.level, floorName: floor ? (floor.level === 0 ? 'Parter' : `Etaj ${floor.level}`) : undefined, x: node.x, y: node.y,
   } : null };
 }
 

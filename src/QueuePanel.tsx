@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { readAccountSession } from './account';
 import airiGroundFloor from './data/airi-ground-floor.json';
+import { floorTwoBuilding } from './data/airi-floor-2';
 import type { AccessibilityProfile, AdminSession, AdminTicket, CreatedQueueTicket, QueueDeskSummary, QueueService, QueueSummary, QueueTicket, QueueTicketStatus } from './types';
 
 const STATUS: Record<QueueTicketStatus, string> = {
@@ -9,7 +10,11 @@ const STATUS: Record<QueueTicketStatus, string> = {
   COMPLETED: 'Finalizat', CANCELLED: 'Anulat', MISSED: 'Neprezentat',
 };
 const terminal = (ticket: Pick<QueueTicket, 'status'>) => ['COMPLETED', 'CANCELLED', 'MISSED'].includes(ticket.status);
-const floorPlan = airiGroundFloor;
+const floorPlan = {
+  ...airiGroundFloor,
+  floors: [...airiGroundFloor.floors, ...floorTwoBuilding.floors],
+  nodes: [...airiGroundFloor.nodes, ...floorTwoBuilding.nodes],
+};
 const normalizeText = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('ro-RO').trim();
 const building = floorPlan;
 const locationLandmarks = building.nodes.filter((node) => node.label?.trim());
@@ -33,7 +38,7 @@ function LocationOptions({ savedId }: { savedId?: string | null }) {
   return <>
     <option value="">Alege un reper pe care îl recunoști</option>
     {savedTechnicalPoint && <option value={savedId} disabled>Punct salvat anterior — alege un reper apropiat</option>}
-    {locationLandmarks.map((node) => <option value={node.id} key={node.id}>{node.label} · {building.floors.find((floor) => floor.id === node.floor)?.name}</option>)}
+    {building.floors.map((floor) => <optgroup label={floor.name} key={floor.id}>{locationLandmarks.filter((node) => node.floor === floor.id).map((node) => <option value={node.id} key={node.id}>{node.label} · {floor.name}</option>)}</optgroup>)}
   </>;
 }
 function restore(): Credentials | null {
