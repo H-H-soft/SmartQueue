@@ -547,3 +547,30 @@ input,select { min-height: 41px; margin: 6px 0 12px; padding: 8px 11px; border: 
   .route-step-list li { grid-template-columns: 28px minmax(0,1fr) auto; gap: 8px; padding: 8px; }
   .route-step-list li strong { font-size: .66rem; }
 }
+/* Ticket assistance forms and the authenticated administrator inbox. */
+.queue-section[hidden] { display: none !important; }
+.ticket-help-form { display: grid; gap: 8px; margin: 18px 0; }
+.ticket-help-form label,.ticket-help-details label { color: #43564a; font-size: .75rem; font-weight: 650; }
+.ticket-help-form label span { font-weight: 400; }
+.ticket-help-form input,.ticket-help-form textarea,.ticket-help-form select,.ticket-help-details select { width: 100%; min-height: 44px; padding: 10px 12px; margin: 0; border: 1px solid #bccabd; border-radius: 8px; background: #fff; color: #303d33; font: inherit; font-size: .82rem; }
+.ticket-help-form textarea { resize: vertical; min-height: 95px; }
+.ticket-help-details { width: 100%; display: grid; gap: 12px; padding: 16px; border: 1px solid #dde6dc; border-radius: 10px; text-align: left; background: #f7faf5; }
+.ticket-help-details p,.ticket-help-details h3 { margin: 0; overflow-wrap: anywhere; }
+.ticket-help-details p { white-space: pre-wrap; }
+.admin-help-inbox { margin-bottom: 22px; }
+.admin-help-inbox .section-heading { margin: 12px 0; }
+.admin-help-inbox .section-heading h2 { font-size: 1.1rem; }
+.admin-help-inbox .section-heading > span { font-size: .75rem; color: #586c5b; }
+.admin-help-inbox button[aria-pressed="true"] { background: #e6efe3; border-color: #356b50; }
+.admin-help-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin-top: 16px; }
+.admin-help-ticket { padding: 19px; border: 1px solid #dfe6dc; border-radius: 11px; background: #fff; overflow-wrap: anywhere; }
+.admin-help-ticket__heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: .75rem; color: #52705a; }
+.admin-help-ticket h3 { font-size: 1.06rem; margin: 14px 0 10px; }
+.admin-help-ticket p { font-size: .8rem; line-height: 1.6; }
+.ticket-requirements { white-space: pre-wrap; }
+.admin-help-ticket .ticket-created-at,.admin-help-ticket .ticket-location-coordinates { font-size: .7rem; color: #586c5b; }
+.ticket-admin-notification { position: fixed; top: 76px; right: 22px; z-index: 50; width: min(390px,calc(100vw - 32px)); max-height: 65vh; overflow-y: auto; padding: 18px; border: 1px solid #8ab395; border-radius: 12px; background: #f1faee; color: #214832; box-shadow: 0 8px 30px #20392422; overflow-wrap: anywhere; }
+.ticket-admin-notification p { margin: 8px 0; font-size: .8rem; white-space: pre-wrap; }
+.ticket-admin-notification details { border-top: 1px solid #c3d8bf; margin-top: 8px; }
+.ticket-admin-notification summary { cursor: pointer; font-size: .8rem; padding: 10px 0; }
+@media (max-width: 700px) { .admin-help-list { grid-template-columns: 1fr; }.ticket-admin-notification { top: 64px; right: 16px; } }

@@ -79,6 +79,30 @@ export function apiRoutes(service, auth, notify, { geminiApiKey, geminiModel } =
       res.status(error.status || 502).json({ error: { message: 'Asistentul AI nu este disponibil momentan.' } });
     }
   });
+  const loginLimit = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
+  api.post('/admin/session', loginLimit, auth.staff, validate(schemas.adminLogin), async (req, res) => {
+    res.status(201).json(await service.createAdminSession(req.body.name));
+  });
+  api.get('/admin/session', auth.admin, (req, res) => res.json(req.admin));
+  api.delete('/admin/session', auth.admin, async (req, res) => {
+    const tickets = await service.logoutAdmin(req.admin.id);
+    for (const ticket of tickets) await notify('publish', 'HELP_RELEASED', await service.ticketState(ticket.id));
+    await notify('adminLogout', req.admin.id);
+    res.status(204).end();
+  });
+  api.get('/admin/tickets', auth.admin, async (req, res) => res.json(await service.adminTickets()));
+  api.post('/admin/tickets/:id/claim', auth.admin, async (req, res) => {
+    const ticket = await service.claimHelp(req.params.id, req.admin.id);
+    await notify('publish', 'HELP_CLAIMED', ticket);
+    res.json(await service.ticketState(ticket.id));
+  });
+  for (const action of ['release', 'complete']) {
+    api.post(`/admin/tickets/:id/${action}`, auth.admin, async (req, res) => {
+      const ticket = await service.manageHelp(req.params.id, req.admin.id, action === 'complete');
+      await notify('publish', action === 'complete' ? 'HELP_COMPLETED' : 'HELP_RELEASED', ticket);
+      res.json(await service.ticketState(ticket.id));
+    });
+  }
   api.get('/services', async (req, res) => res.json(await service.listServices()));
   api.post('/services', auth.staff, validate(schemas.service), async (req, res) => {
     res.status(201).json(await service.createService(req.body));
@@ -94,6 +118,11 @@ export function apiRoutes(service, auth, notify, { geminiApiKey, geminiModel } =
     res.status(201).json({ ...await service.ticketState(ticket.id), accessToken: ticket.accessToken });
   });
   api.get('/tickets/:id', auth.ticket, async (req, res) => res.json(await service.ticketState(req.params.id)));
+  api.patch('/tickets/:id/location', auth.ticket, validate(schemas.location), async (req, res) => {
+    const ticket = await service.updateRequesterLocation(req.params.id, req.body.requesterLocationId);
+    await notify('publish', 'REQUESTER_LOCATION_CHANGED', ticket);
+    res.json(await service.ticketState(ticket.id));
+  });
   api.delete('/tickets/:id', auth.ticket, async (req, res) => {
     const ticket = await service.changeStatus(req.params.id, 'CANCELLED');
     await notify('publish', 'TICKET_CANCELLED', ticket);

@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import { readFileSync } from 'node:fs';
+
+const building = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const location = z.string().refine((value) => building.nodes.some((node) => node.id === value && node.label?.trim()), 'Alege un reper numit din plan, nu un punct tehnic de scanare.');
 
 const id = z.string().trim().min(1).max(100);
 const name = z.string().trim().min(1).max(120);
@@ -10,7 +14,12 @@ export const schemas = {
     highContrast: z.boolean().optional(),
     largeText: z.boolean().optional(),
   }).strict().refine((value) => Object.keys(value).length > 0),
-  ticket: z.object({ serviceId: id, profile: z.enum(['standard', 'wheelchair', 'visual', 'reduced']).default('standard') }).strict(),
+  ticket: z.object({ serviceId: id, profile: z.enum(['standard', 'wheelchair', 'visual', 'reduced']).default('standard'),
+    helpSummary: z.string().trim().min(5).max(160).optional(),
+    helpRequirements: z.string().trim().max(1000).optional(), requesterLocationId: location.optional(),
+  }).strict().refine((value) => !value.helpSummary || Boolean(value.requesterLocationId), 'A help request needs a map location.'),
+  adminLogin: z.object({ name: name }).strict(),
+  location: z.object({ requesterLocationId: location }).strict(),
   service: z.object({ name, prefix: z.string().regex(/^[A-Z]{1,8}$/), avgMinutes: z.number().positive().max(480), active: z.boolean().optional() }).strict(),
   serviceUpdate: z.object({ name: name.optional(), avgMinutes: z.number().positive().max(480).optional(), active: z.boolean().optional() }).strict(),
   desk: z.object({ name, buildingId: id, floor: z.number().int(), locationId: id,

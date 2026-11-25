@@ -1,7 +1,6 @@
 {
   "id": "airi-utcn",
   "name": "AIRI @ UTCN",
-  "name": "AIRI @ UTCN · Strada Observatorului 2",
   "source": {
     "provider": "Matterport",
     "modelId": "aCMSqhHHnKV",
@@ -11,11 +10,6 @@
     "scanDate": "2026-11-15",
     "accessibilityVerified": false,
     "note": "Planul pereților este extras din geometria 3D a turului la înălțimea de 1,2 m. Pozițiile sunt coordonatele scanărilor Matterport. Traseele folosesc legături de navigare existente în tur; lungimea fiecărui segment este distanța geometrică dintre două scanări. Accesul fără trepte, lățimea ușilor și orientarea utilizatorului nu au fost confirmate la fața locului."
-    "floorLabel": "Floor 1",
-    "floorAreaSquareMeters": 2605.0,
-    "scanDate": "2026-11-15",
-    "accessibilityVerified": false,
-    "note": "Pozițiile scanărilor sunt proiectate din coordonatele orizontale publice ale modelului. Traseele și distanțele sunt estimări geometrice; coridoarele, obstacolele și accesibilitatea trebuie validate la fața locului."
   },
   "floors": [
     {
@@ -26,10 +20,6 @@
       "width": 1000,
       "height": 800,
       "pixelsPerMeter": 10
-      "name": "Parter · Floor 1 în turul AIRI",
-      "plan": "",
-      "width": 1000,
-      "height": 700
     }
   ],
   "nodes": [
@@ -40,100 +30,6 @@
       "x": 452.19,
       "y": 482.8,
       "label": "Intrarea principală · interior"
-      "id": "scan-0",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 944.3,
-      "y": 197.4,
-      "label": "#0"
-    },
-    {
-      "id": "scan-1",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 851.6,
-      "y": 198.5,
-      "label": "#1"
-    },
-    {
-      "id": "scan-2",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 772.3,
-      "y": 199.2,
-      "label": "#2"
-    },
-    {
-      "id": "scan-3",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 695.6,
-      "y": 199.6,
-      "label": "#3"
-    },
-    {
-      "id": "scan-4",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 643.8,
-      "y": 196.1,
-      "label": "#4"
-    },
-    {
-      "id": "scan-5",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 588.7,
-      "y": 194.2,
-      "label": "#5"
-    },
-    {
-      "id": "scan-6",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 535.9,
-      "y": 194.8,
-      "label": "#6"
-    },
-    {
-      "id": "scan-7",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 538.9,
-      "y": 113.6,
-      "label": "#7"
-    },
-    {
-      "id": "scan-8",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 537.8,
-      "y": 40.0,
-      "label": "#8"
-    },
-    {
-      "id": "scan-9",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 536.6,
-      "y": 269.5,
-      "label": "#9"
-    },
-    {
-      "id": "scan-10",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 535.9,
-      "y": 350.2,
-      "label": "#10"
-    },
-    {
-      "id": "scan-11",
-      "floor": "airi-ground",
-      "type": "junction",
-      "x": 535.7,
-      "y": 414.9,
-      "label": "#11"
     },
     {
       "id": "scan-12",
@@ -141,10 +37,6 @@
       "type": "corridor",
       "x": 451.62,
       "y": 529.13
-      "type": "junction",
-      "x": 534.8,
-      "y": 485.0,
-      "label": "#12"
     },
     {
       "id": "scan-13",
@@ -152,10 +44,6 @@
       "type": "corridor",
       "x": 451.21,
       "y": 572.81
-      "type": "junction",
-      "x": 534.2,
-      "y": 551.1,
-      "label": "#13"
     },
     {
       "id": "scan-14",
@@ -163,10 +51,6 @@
       "type": "corridor",
       "x": 451.56,
       "y": 606.3
-      "type": "junction",
-      "x": 534.8,
-      "y": 601.8,
-      "label": "#14"
     },
     {
       "id": "scan-15",
@@ -174,10 +58,6 @@
       "type": "corridor",
       "x": 506.95,
       "y": 605.11
-      "type": "junction",
-      "x": 618.6,
-      "y": 600.0,
-      "label": "#15"
     },
     {
       "id": "scan-16",
@@ -186,9 +66,6 @@
       "x": 507.13,
       "y": 630.71,
       "label": "Ușă marcată cu simbol de accesibilitate"
-      "x": 618.9,
-      "y": 638.8,
-      "label": "#16"
     },
     {
       "id": "scan-17",
@@ -196,10 +73,6 @@
       "type": "corridor",
       "x": 562.95,
       "y": 605.92
-      "type": "junction",
-      "x": 703.4,
-      "y": 601.2,
-      "label": "#17"
     },
     {
       "id": "scan-18",
@@ -207,10 +80,6 @@
       "type": "corridor",
       "x": 610.91,
       "y": 606.26
-      "type": "junction",
-      "x": 776.0,
-      "y": 601.8,
-      "label": "#18"
     },
     {
       "id": "scan-19",
@@ -218,10 +87,6 @@
       "type": "corridor",
       "x": 648,
       "y": 606.67
-      "type": "junction",
-      "x": 832.1,
-      "y": 602.4,
-      "label": "#19"
     },
     {
       "id": "scan-20",
@@ -229,10 +94,6 @@
       "type": "corridor",
       "x": 687.58,
       "y": 607.04
-      "type": "junction",
-      "x": 892.0,
-      "y": 602.9,
-      "label": "#20"
     },
     {
       "id": "scan-21",
@@ -240,10 +101,6 @@
       "type": "corridor",
       "x": 451.1,
       "y": 644.74
-      "type": "junction",
-      "x": 534.1,
-      "y": 660.0,
-      "label": "#21"
     },
     {
       "id": "scan-22",
@@ -252,10 +109,6 @@
       "x": 402.61,
       "y": 644.47,
       "label": "Ieșire · indicator EXIT"
-      "type": "junction",
-      "x": 460.7,
-      "y": 659.6,
-      "label": "#22"
     },
     {
       "id": "scan-23",
@@ -264,10 +117,6 @@
       "x": 403.74,
       "y": 572.42,
       "label": "Gradenele atriumului"
-      "type": "junction",
-      "x": 462.4,
-      "y": 550.5,
-      "label": "#23"
     },
     {
       "id": "scan-24",
@@ -276,9 +125,6 @@
       "x": 403.76,
       "y": 529.44,
       "label": "Atrium"
-      "x": 462.4,
-      "y": 485.5,
-      "label": "#24"
     },
     {
       "id": "scan-25",
@@ -286,10 +132,6 @@
       "type": "corridor",
       "x": 349.42,
       "y": 529.64
-      "type": "junction",
-      "x": 380.2,
-      "y": 485.8,
-      "label": "#25"
     },
     {
       "id": "scan-26",
@@ -298,10 +140,6 @@
       "x": 289.77,
       "y": 528.95,
       "label": "Lift"
-      "type": "junction",
-      "x": 289.8,
-      "y": 484.7,
-      "label": "#26"
     },
     {
       "id": "scan-27",
@@ -309,10 +147,6 @@
       "type": "corridor",
       "x": 289.63,
       "y": 551.34
-      "type": "junction",
-      "x": 289.6,
-      "y": 518.6,
-      "label": "#27"
     },
     {
       "id": "scan-28",
@@ -320,10 +154,6 @@
       "type": "corridor",
       "x": 289.15,
       "y": 605.61
-      "type": "junction",
-      "x": 288.9,
-      "y": 600.8,
-      "label": "#28"
     },
     {
       "id": "scan-29",
@@ -332,10 +162,6 @@
       "x": 334.63,
       "y": 607.66,
       "label": "Recepție · tejghea"
-      "type": "junction",
-      "x": 357.8,
-      "y": 603.9,
-      "label": "#29"
     },
     {
       "id": "scan-30",
@@ -343,10 +169,6 @@
       "type": "corridor",
       "x": 332.56,
       "y": 644.39
-      "type": "junction",
-      "x": 354.6,
-      "y": 659.5,
-      "label": "#30"
     },
     {
       "id": "scan-31",
@@ -355,9 +177,6 @@
       "x": 402.83,
       "y": 605.63,
       "label": "Turnicheții de acces"
-      "x": 461.0,
-      "y": 600.8,
-      "label": "#31"
     },
     {
       "id": "scan-32",
@@ -365,10 +184,6 @@
       "type": "corridor",
       "x": 264.88,
       "y": 551.66
-      "type": "junction",
-      "x": 252.2,
-      "y": 519.1,
-      "label": "#32"
     },
     {
       "id": "scan-33",
@@ -376,10 +191,6 @@
       "type": "corridor",
       "x": 238.22,
       "y": 550.8
-      "type": "junction",
-      "x": 211.8,
-      "y": 517.8,
-      "label": "#33"
     },
     {
       "id": "scan-178",
@@ -388,9 +199,6 @@
       "x": 281.23,
       "y": 607.24,
       "label": "Camera 105"
-      "x": 276.9,
-      "y": 603.2,
-      "label": "#178"
     },
     {
       "id": "scan-179",
@@ -398,10 +206,6 @@
       "type": "corridor",
       "x": 263.97,
       "y": 607.11
-      "type": "junction",
-      "x": 250.8,
-      "y": 603.0,
-      "label": "#179"
     },
     {
       "id": "scan-180",
@@ -409,10 +213,6 @@
       "type": "corridor",
       "x": 190.17,
       "y": 605.63
-      "type": "junction",
-      "x": 139.1,
-      "y": 600.8,
-      "label": "#180"
     },
     {
       "id": "scan-181",
@@ -420,10 +220,6 @@
       "type": "corridor",
       "x": 190.97,
       "y": 628.6
-      "type": "junction",
-      "x": 140.3,
-      "y": 635.6,
-      "label": "#181"
     },
     {
       "id": "scan-182",
@@ -431,10 +227,6 @@
       "type": "corridor",
       "x": 135.1,
       "y": 605.88
-      "type": "junction",
-      "x": 55.7,
-      "y": 601.2,
-      "label": "#182"
     }
   ],
   "edges": [
@@ -442,9 +234,6 @@
       "from": "scan-11",
       "to": "scan-12",
       "distance": 4.63,
-      "from": "scan-1",
-      "to": "scan-9",
-      "distance": 21.3,
       "mode": "walk",
       "stepFree": null
     },
@@ -452,9 +241,6 @@
       "from": "scan-11",
       "to": "scan-24",
       "distance": 6.72,
-      "from": "scan-2",
-      "to": "scan-9",
-      "distance": 16.3,
       "mode": "walk",
       "stepFree": null
     },
@@ -462,9 +248,6 @@
       "from": "scan-12",
       "to": "scan-13",
       "distance": 4.37,
-      "from": "scan-26",
-      "to": "scan-27",
-      "distance": 2.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -472,9 +255,6 @@
       "from": "scan-12",
       "to": "scan-23",
       "distance": 6.45,
-      "from": "scan-4",
-      "to": "scan-11",
-      "distance": 16.1,
       "mode": "walk",
       "stepFree": null
     },
@@ -482,9 +262,6 @@
       "from": "scan-12",
       "to": "scan-24",
       "distance": 4.79,
-      "from": "scan-5",
-      "to": "scan-6",
-      "distance": 3.5,
       "mode": "walk",
       "stepFree": null
     },
@@ -492,9 +269,6 @@
       "from": "scan-13",
       "to": "scan-14",
       "distance": 3.35,
-      "from": "scan-12",
-      "to": "scan-13",
-      "distance": 4.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -502,9 +276,6 @@
       "from": "scan-13",
       "to": "scan-23",
       "distance": 4.75,
-      "from": "scan-15",
-      "to": "scan-17",
-      "distance": 5.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -512,9 +283,6 @@
       "from": "scan-13",
       "to": "scan-24",
       "distance": 6.43,
-      "from": "scan-9",
-      "to": "scan-26",
-      "distance": 21.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -522,9 +290,6 @@
       "from": "scan-13",
       "to": "scan-31",
       "distance": 5.85,
-      "from": "scan-1",
-      "to": "scan-6",
-      "distance": 20.9,
       "mode": "walk",
       "stepFree": null
     },
@@ -532,9 +297,6 @@
       "from": "scan-14",
       "to": "scan-15",
       "distance": 5.54,
-      "from": "scan-12",
-      "to": "scan-14",
-      "distance": 7.7,
       "mode": "walk",
       "stepFree": null
     },
@@ -542,9 +304,6 @@
       "from": "scan-14",
       "to": "scan-21",
       "distance": 3.84,
-      "from": "scan-21",
-      "to": "scan-31",
-      "distance": 6.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -552,9 +311,6 @@
       "from": "scan-14",
       "to": "scan-22",
       "distance": 6.21,
-      "from": "scan-25",
-      "to": "scan-32",
-      "distance": 8.7,
       "mode": "walk",
       "stepFree": null
     },
@@ -562,9 +318,6 @@
       "from": "scan-14",
       "to": "scan-23",
       "distance": 5.86,
-      "from": "scan-21",
-      "to": "scan-23",
-      "distance": 8.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -572,8 +325,6 @@
       "from": "scan-14",
       "to": "scan-31",
       "distance": 4.87,
-      "to": "scan-15",
-      "distance": 5.5,
       "mode": "walk",
       "stepFree": null
     },
@@ -581,9 +332,6 @@
       "from": "scan-15",
       "to": "scan-16",
       "distance": 2.56,
-      "from": "scan-17",
-      "to": "scan-31",
-      "distance": 16.0,
       "mode": "walk",
       "stepFree": null
     },
@@ -591,9 +339,6 @@
       "from": "scan-15",
       "to": "scan-17",
       "distance": 5.6,
-      "from": "scan-12",
-      "to": "scan-31",
-      "distance": 9.1,
       "mode": "walk",
       "stepFree": null
     },
@@ -601,9 +346,6 @@
       "from": "scan-17",
       "to": "scan-18",
       "distance": 4.8,
-      "from": "scan-7",
-      "to": "scan-25",
-      "distance": 26.7,
       "mode": "walk",
       "stepFree": null
     },
@@ -611,9 +353,6 @@
       "from": "scan-18",
       "to": "scan-19",
       "distance": 3.71,
-      "from": "scan-28",
-      "to": "scan-31",
-      "distance": 11.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -621,9 +360,6 @@
       "from": "scan-19",
       "to": "scan-20",
       "distance": 3.96,
-      "from": "scan-179",
-      "to": "scan-180",
-      "distance": 7.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -631,9 +367,6 @@
       "from": "scan-21",
       "to": "scan-22",
       "distance": 4.85,
-      "from": "scan-20",
-      "to": "scan-178",
-      "distance": 40.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -641,9 +374,6 @@
       "from": "scan-21",
       "to": "scan-31",
       "distance": 6.21,
-      "from": "scan-1",
-      "to": "scan-7",
-      "distance": 21.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -651,9 +381,6 @@
       "from": "scan-22",
       "to": "scan-31",
       "distance": 3.88,
-      "from": "scan-14",
-      "to": "scan-22",
-      "distance": 6.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -661,9 +388,6 @@
       "from": "scan-23",
       "to": "scan-24",
       "distance": 4.3,
-      "from": "scan-7",
-      "to": "scan-8",
-      "distance": 4.9,
       "mode": "walk",
       "stepFree": null
     },
@@ -671,9 +395,6 @@
       "from": "scan-23",
       "to": "scan-25",
       "distance": 6.91,
-      "from": "scan-33",
-      "to": "scan-179",
-      "distance": 6.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -681,9 +402,6 @@
       "from": "scan-23",
       "to": "scan-31",
       "distance": 3.32,
-      "from": "scan-4",
-      "to": "scan-9",
-      "distance": 8.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -691,9 +409,6 @@
       "from": "scan-24",
       "to": "scan-25",
       "distance": 5.43,
-      "from": "scan-13",
-      "to": "scan-14",
-      "distance": 3.3,
       "mode": "walk",
       "stepFree": null
     },
@@ -701,9 +416,6 @@
       "from": "scan-25",
       "to": "scan-26",
       "distance": 5.97,
-      "from": "scan-14",
-      "to": "scan-182",
-      "distance": 31.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -711,9 +423,6 @@
       "from": "scan-26",
       "to": "scan-27",
       "distance": 2.24,
-      "from": "scan-12",
-      "to": "scan-25",
-      "distance": 10.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -721,9 +430,6 @@
       "from": "scan-26",
       "to": "scan-32",
       "distance": 3.37,
-      "from": "scan-178",
-      "to": "scan-180",
-      "distance": 9.1,
       "mode": "walk",
       "stepFree": null
     },
@@ -731,9 +437,6 @@
       "from": "scan-27",
       "to": "scan-28",
       "distance": 5.43,
-      "from": "scan-19",
-      "to": "scan-28",
-      "distance": 35.9,
       "mode": "walk",
       "stepFree": null
     },
@@ -741,9 +444,6 @@
       "from": "scan-27",
       "to": "scan-32",
       "distance": 2.47,
-      "from": "scan-18",
-      "to": "scan-31",
-      "distance": 20.8,
       "mode": "walk",
       "stepFree": null
     },
@@ -751,9 +451,6 @@
       "from": "scan-27",
       "to": "scan-33",
       "distance": 5.14,
-      "from": "scan-3",
-      "to": "scan-24",
-      "distance": 24.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -761,9 +458,6 @@
       "from": "scan-27",
       "to": "scan-178",
       "distance": 5.65,
-      "from": "scan-5",
-      "to": "scan-7",
-      "distance": 6.3,
       "mode": "walk",
       "stepFree": null
     },
@@ -771,9 +465,6 @@
       "from": "scan-27",
       "to": "scan-179",
       "distance": 6.14,
-      "from": "scan-17",
-      "to": "scan-20",
-      "distance": 12.5,
       "mode": "walk",
       "stepFree": null
     },
@@ -781,16 +472,6 @@
       "from": "scan-28",
       "to": "scan-29",
       "distance": 4.55,
-      "from": "scan-8",
-      "to": "scan-25",
-      "distance": 31.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-20",
-      "to": "scan-29",
-      "distance": 35.3,
       "mode": "walk",
       "stepFree": null
     },
@@ -798,9 +479,6 @@
       "from": "scan-28",
       "to": "scan-32",
       "distance": 5.92,
-      "from": "scan-13",
-      "to": "scan-24",
-      "distance": 6.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -808,9 +486,6 @@
       "from": "scan-28",
       "to": "scan-178",
       "distance": 0.81,
-      "from": "scan-19",
-      "to": "scan-20",
-      "distance": 4.0,
       "mode": "walk",
       "stepFree": null
     },
@@ -818,9 +493,6 @@
       "from": "scan-28",
       "to": "scan-179",
       "distance": 2.52,
-      "from": "scan-27",
-      "to": "scan-179",
-      "distance": 6.1,
       "mode": "walk",
       "stepFree": null
     },
@@ -828,9 +500,6 @@
       "from": "scan-29",
       "to": "scan-30",
       "distance": 3.68,
-      "from": "scan-0",
-      "to": "scan-3",
-      "distance": 16.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -838,9 +507,6 @@
       "from": "scan-29",
       "to": "scan-31",
       "distance": 6.82,
-      "from": "scan-26",
-      "to": "scan-178",
-      "distance": 7.9,
       "mode": "walk",
       "stepFree": null
     },
@@ -848,9 +514,6 @@
       "from": "scan-29",
       "to": "scan-178",
       "distance": 5.34,
-      "from": "scan-15",
-      "to": "scan-29",
-      "distance": 17.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -858,9 +521,6 @@
       "from": "scan-32",
       "to": "scan-33",
       "distance": 2.67,
-      "from": "scan-20",
-      "to": "scan-31",
-      "distance": 28.5,
       "mode": "walk",
       "stepFree": null
     },
@@ -868,9 +528,6 @@
       "from": "scan-32",
       "to": "scan-178",
       "distance": 5.79,
-      "from": "scan-13",
-      "to": "scan-22",
-      "distance": 8.7,
       "mode": "walk",
       "stepFree": null
     },
@@ -878,9 +535,6 @@
       "from": "scan-32",
       "to": "scan-179",
       "distance": 5.55,
-      "from": "scan-4",
-      "to": "scan-10",
-      "distance": 12.4,
       "mode": "walk",
       "stepFree": null
     },
@@ -888,9 +542,6 @@
       "from": "scan-33",
       "to": "scan-179",
       "distance": 6.19,
-      "from": "scan-24",
-      "to": "scan-31",
-      "distance": 7.6,
       "mode": "walk",
       "stepFree": null
     },
@@ -898,9 +549,6 @@
       "from": "scan-178",
       "to": "scan-179",
       "distance": 1.73,
-      "from": "scan-27",
-      "to": "scan-33",
-      "distance": 5.1,
       "mode": "walk",
       "stepFree": null
     },
@@ -908,9 +556,6 @@
       "from": "scan-180",
       "to": "scan-181",
       "distance": 2.3,
-      "from": "scan-14",
-      "to": "scan-28",
-      "distance": 16.2,
       "mode": "walk",
       "stepFree": null
     },
@@ -960,1139 +605,4 @@
       "text": "Ușă cu indicator luminos EXIT"
     }
   ]
-      "from": "scan-4",
-      "to": "scan-6",
-      "distance": 7.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-8",
-      "to": "scan-24",
-      "distance": 29.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-27",
-      "to": "scan-28",
-      "distance": 5.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-4",
-      "distance": 3.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-31",
-      "distance": 6.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-6",
-      "distance": 15.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-20",
-      "distance": 18.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-9",
-      "to": "scan-10",
-      "distance": 5.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-179",
-      "distance": 24.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-20",
-      "distance": 23.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-23",
-      "distance": 10.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-21",
-      "distance": 3.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-22",
-      "to": "scan-31",
-      "distance": 3.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-28",
-      "distance": 21.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-23",
-      "to": "scan-25",
-      "distance": 6.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-11",
-      "distance": 17.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-10",
-      "distance": 10.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-32",
-      "distance": 40.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-24",
-      "distance": 19.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-23",
-      "to": "scan-31",
-      "distance": 3.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-182",
-      "distance": 15.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-25",
-      "to": "scan-33",
-      "distance": 11.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-24",
-      "to": "scan-26",
-      "distance": 11.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-12",
-      "distance": 4.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-29",
-      "distance": 27.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-28",
-      "distance": 27.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-29",
-      "distance": 4.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-19",
-      "to": "scan-31",
-      "distance": 24.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-19",
-      "distance": 19.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-24",
-      "distance": 9.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-26",
-      "to": "scan-28",
-      "distance": 7.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-10",
-      "to": "scan-31",
-      "distance": 17.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-22",
-      "distance": 16.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-23",
-      "distance": 5.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-8",
-      "distance": 14.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-13",
-      "to": "scan-25",
-      "distance": 11.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-26",
-      "to": "scan-32",
-      "distance": 3.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-22",
-      "to": "scan-23",
-      "distance": 7.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-32",
-      "to": "scan-33",
-      "distance": 2.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-4",
-      "to": "scan-5",
-      "distance": 3.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-4",
-      "distance": 8.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-5",
-      "distance": 12.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-31",
-      "distance": 13.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-12",
-      "distance": 19.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-2",
-      "distance": 5.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-18",
-      "distance": 15.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-179",
-      "distance": 34.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-9",
-      "to": "scan-23",
-      "distance": 19.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-22",
-      "to": "scan-24",
-      "distance": 11.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-13",
-      "to": "scan-31",
-      "distance": 5.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-33",
-      "to": "scan-178",
-      "distance": 7.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-28",
-      "distance": 32.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-31",
-      "to": "scan-182",
-      "distance": 26.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-13",
-      "distance": 9.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-31",
-      "distance": 4.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-3",
-      "distance": 5.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-22",
-      "distance": 31.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-31",
-      "to": "scan-179",
-      "distance": 13.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-23",
-      "distance": 10.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-30",
-      "distance": 3.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-5",
-      "distance": 23.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-31",
-      "to": "scan-178",
-      "distance": 12.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-33",
-      "distance": 7.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-21",
-      "to": "scan-22",
-      "distance": 4.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-178",
-      "distance": 33.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-32",
-      "to": "scan-179",
-      "distance": 5.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-31",
-      "distance": 28.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-26",
-      "to": "scan-179",
-      "distance": 8.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-179",
-      "to": "scan-182",
-      "distance": 12.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-30",
-      "to": "scan-32",
-      "distance": 11.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-32",
-      "distance": 5.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-2",
-      "distance": 11.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-12",
-      "to": "scan-24",
-      "distance": 4.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-178",
-      "distance": 17.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-31",
-      "distance": 10.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-12",
-      "to": "scan-21",
-      "distance": 11.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-180",
-      "distance": 37.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-178",
-      "distance": 28.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-20",
-      "distance": 7.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-180",
-      "distance": 31.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-12",
-      "to": "scan-23",
-      "distance": 6.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-179",
-      "distance": 18.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-25",
-      "to": "scan-26",
-      "distance": 6.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-29",
-      "distance": 11.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-18",
-      "distance": 10.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-10",
-      "distance": 28.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-22",
-      "distance": 31.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-179",
-      "distance": 7.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-6",
-      "distance": 27.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-1",
-      "distance": 6.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-19",
-      "to": "scan-29",
-      "distance": 31.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-9",
-      "to": "scan-22",
-      "distance": 26.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-7",
-      "distance": 5.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-8",
-      "distance": 18.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-180",
-      "to": "scan-181",
-      "distance": 2.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-10",
-      "distance": 10.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-8",
-      "to": "scan-10",
-      "distance": 20.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-9",
-      "distance": 27.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-18",
-      "distance": 4.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-24",
-      "distance": 6.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-31",
-      "to": "scan-180",
-      "distance": 21.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-178",
-      "distance": 5.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-8",
-      "distance": 10.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-18",
-      "to": "scan-19",
-      "distance": 3.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-178",
-      "to": "scan-179",
-      "distance": 1.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-180",
-      "distance": 26.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-16",
-      "distance": 2.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-21",
-      "distance": 16.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-182",
-      "distance": 20.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-182",
-      "distance": 37.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-24",
-      "distance": 21.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-25",
-      "distance": 11.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-6",
-      "distance": 10.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-29",
-      "to": "scan-180",
-      "distance": 14.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-178",
-      "to": "scan-182",
-      "distance": 14.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-27",
-      "to": "scan-178",
-      "distance": 5.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-13",
-      "to": "scan-23",
-      "distance": 4.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-25",
-      "distance": 12.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-10",
-      "to": "scan-22",
-      "distance": 21.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-7",
-      "to": "scan-9",
-      "distance": 10.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-4",
-      "distance": 19.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-179",
-      "distance": 2.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-10",
-      "distance": 18.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-10",
-      "distance": 14.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-7",
-      "to": "scan-24",
-      "distance": 25.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-8",
-      "distance": 10.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-12",
-      "to": "scan-26",
-      "distance": 16.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-12",
-      "to": "scan-22",
-      "distance": 12.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-7",
-      "distance": 27.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-0",
-      "to": "scan-8",
-      "distance": 28.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-5",
-      "distance": 17.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-20",
-      "to": "scan-28",
-      "distance": 39.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-7",
-      "to": "scan-10",
-      "distance": 15.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-179",
-      "distance": 29.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-19",
-      "distance": 14.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-180",
-      "to": "scan-182",
-      "distance": 5.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-19",
-      "to": "scan-178",
-      "distance": 36.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-2",
-      "to": "scan-7",
-      "distance": 16.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-27",
-      "to": "scan-32",
-      "distance": 2.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-9",
-      "distance": 4.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-32",
-      "to": "scan-178",
-      "distance": 5.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-29",
-      "distance": 22.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-24",
-      "to": "scan-27",
-      "distance": 11.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-10",
-      "distance": 23.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-13",
-      "to": "scan-21",
-      "distance": 7.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-8",
-      "to": "scan-9",
-      "distance": 15.2,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-180",
-      "distance": 9.9,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-21",
-      "to": "scan-24",
-      "distance": 12.5,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-4",
-      "distance": 13.7,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-14",
-      "to": "scan-17",
-      "distance": 11.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-15",
-      "to": "scan-178",
-      "distance": 22.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-6",
-      "to": "scan-31",
-      "distance": 27.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-9",
-      "to": "scan-32",
-      "distance": 25.0,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-3",
-      "to": "scan-5",
-      "distance": 7.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-5",
-      "to": "scan-9",
-      "distance": 6.1,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-3",
-      "distance": 10.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-11",
-      "to": "scan-14",
-      "distance": 12.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-24",
-      "to": "scan-25",
-      "distance": 5.4,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-23",
-      "to": "scan-24",
-      "distance": 4.3,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-1",
-      "to": "scan-26",
-      "distance": 41.6,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-28",
-      "to": "scan-178",
-      "distance": 0.8,
-      "mode": "walk",
-      "stepFree": null
-    },
-    {
-      "from": "scan-17",
-      "to": "scan-19",
-      "distance": 8.5,
-      "mode": "walk",
-      "stepFree": null
-    }
-  ],
-  "landmarks": []
 }

@@ -1,6 +1,19 @@
 import { transaction } from './database.js';
 import { estimateWait } from './estimationService.js';
 import { activeStatuses, assertTransition, fail, hashToken, newToken, publicTicket } from './domain.js';
+import { readFileSync } from 'node:fs';
+
+const building = JSON.parse(readFileSync(new URL('../data/airi-ground-floor.json', import.meta.url), 'utf8'));
+const claimant = { select: { id: true, name: true, expiresAt: true, revokedAt: true } };
+const pendingStatuses = ['WAITING', 'CALLED', 'SERVING'];
+function withLocation(ticket) {
+  const node = building.nodes.find((item) => item.id === ticket.requesterLocationId);
+  const floor = building.floors.find((item) => item.id === node?.floor);
+  return { ...publicTicket(ticket), requesterLocation: node ? {
+    id: node.id, name: node.label ?? node.id, buildingId: building.id, buildingName: building.name,
+    floorId: node.floor, floor: floor?.level, floorName: floor?.name, x: node.x, y: node.y,
+  } : null };
+}
 
 export function createQueueService(db) {
   const get = async (tx, model, id) => {
@@ -31,6 +44,50 @@ export function createQueueService(db) {
       where: { accountId }, orderBy: { createdAt: 'desc' }, take: 12,
       select: { id: true, number: true, status: true, profile: true, createdAt: true,
         service: { select: { name: true } }, desk: { select: { name: true, floor: true } } },
+    }),
+    createAdminSession: async (name) => {
+      const accessToken = newToken();
+      const session = await db.adminSession.create({ data: { name, tokenHash: hashToken(accessToken),
+        expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000) }, select: { id: true, name: true, expiresAt: true } });
+      return { ...session, accessToken };
+    },
+    findAdminSession: (token) => {
+      if (typeof token !== 'string' || token.length !== 64) return Promise.resolve(null);
+      return db.adminSession.findFirst({ where: { tokenHash: hashToken(token), revokedAt: null, expiresAt: { gt: new Date() } },
+        select: { id: true, name: true, expiresAt: true } });
+    },
+    adminSessionActive: (id) => db.adminSession.findFirst({ where: { id, revokedAt: null, expiresAt: { gt: new Date() } }, select: { id: true } }),
+    logoutAdmin: (id) => transaction(db, async (tx) => {
+      const tickets = await tx.ticket.findMany({ where: { claimedById: id, helpCompletedAt: null }, select: { id: true } });
+      await tx.adminSession.update({ where: { id }, data: { revokedAt: new Date() } });
+      await tx.ticket.updateMany({ where: { claimedById: id, helpCompletedAt: null }, data: { claimedById: null, claimedAt: null } });
+      return tickets;
+    }),
+    adminTickets: async () => (await db.ticket.findMany({ orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      include: { desk: true, service: { select: { name: true } }, claimedBy: claimant } })).map(withLocation),
+    claimHelp: (id, adminId) => transaction(db, async (tx) => {
+      const ticket = await get(tx, 'ticket', id);
+      if (!pendingStatuses.includes(ticket.status) || ticket.helpCompletedAt) fail(409, 'Cererea nu mai este disponibilă.');
+      if (ticket.claimedById) {
+        const owner = await tx.adminSession.findUnique({ where: { id: ticket.claimedById } });
+        if (owner && !owner.revokedAt && owner.expiresAt > new Date()) fail(409, 'Cererea a fost deja preluată de un alt administrator.');
+      }
+      const result = await tx.ticket.updateMany({ where: { id, claimedById: ticket.claimedById, helpCompletedAt: null, status: { in: pendingStatuses } },
+        data: { claimedById: adminId, claimedAt: new Date() } });
+      if (!result.count) fail(409, 'Cererea a fost deja preluată de un alt administrator.');
+      return withLocation(await tx.ticket.findUnique({ where: { id }, include: { desk: true, claimedBy: claimant } }));
+    }),
+    manageHelp: (id, adminId, complete) => transaction(db, async (tx) => {
+      await get(tx, 'ticket', id);
+      const result = await tx.ticket.updateMany({ where: { id, claimedById: adminId, helpCompletedAt: null },
+        data: complete ? { helpCompletedAt: new Date() } : { claimedById: null, claimedAt: null } });
+      if (!result.count) fail(409, 'Doar administratorul care a preluat cererea o poate modifica.');
+      return withLocation(await tx.ticket.findUnique({ where: { id }, include: { desk: true, claimedBy: claimant } }));
+    }),
+    updateRequesterLocation: (id, requesterLocationId) => transaction(db, async (tx) => {
+      const ticket = await get(tx, 'ticket', id);
+      if (!pendingStatuses.includes(ticket.status)) fail(409, 'Tichetul este închis.');
+      return withLocation(await tx.ticket.update({ where: { id }, data: { requesterLocationId }, include: { desk: true, claimedBy: claimant } }));
     }),
     listServices: () => db.service.findMany({ select: {
       id: true, name: true, prefix: true, avgMinutes: true, active: true,
@@ -82,12 +139,12 @@ export function createQueueService(db) {
       return db.ticket.findFirst({ where: { deskId: id, status: { in: activeStatuses } } });
     },
     ticketState: (id) => transaction(db, async (tx) => {
-      const ticket = await tx.ticket.findUnique({ where: { id }, include: { desk: true } });
+      const ticket = await tx.ticket.findUnique({ where: { id }, include: { desk: true, claimedBy: claimant } });
       if (!ticket) fail(404, 'Ticket not found.');
       const service = await get(tx, 'service', ticket.serviceId);
       const ahead = ticket.status === 'WAITING'
         ? await tx.ticket.count({ where: { serviceId: ticket.serviceId, status: 'WAITING', sequence: { lt: ticket.sequence } } }) : 0;
-      return { ...publicTicket(ticket), visitorsAhead: ahead,
+      return { ...withLocation(ticket), visitorsAhead: ahead,
         positionInQueue: ticket.status === 'WAITING' ? ahead + 1 : null,
         estimatedWaitMinutes: ticket.status === 'WAITING' && service.active
           ? estimateWait(ahead, await openDesks(tx, ticket.serviceId), service.avgMinutes) : null,

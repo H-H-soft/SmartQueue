@@ -16,12 +16,17 @@ export function createAuth(service, staffKey) {
   }
   return {
     isStaff,
-    staff(req, res, next) {
-      if (!isStaff(bearer(req))) fail(401, 'Staff authorization required.');
+    async staff(req, res, next) {
+      if (!isStaff(bearer(req)) && !await service.findAdminSession(bearer(req))) fail(401, 'Staff authorization required.');
+      next();
+    },
+    async admin(req, res, next) {
+      req.admin = await service.findAdminSession(bearer(req));
+      if (!req.admin) fail(401, 'Administrator login required.');
       next();
     },
     async ticket(req, res, next) {
-      if (!isStaff(bearer(req))) {
+      if (!isStaff(bearer(req)) && !await service.findAdminSession(bearer(req))) {
         const ticket = await service.findTicket(req.params.id);
         if (!ticket || !equalSecret(ticket.tokenHash, hashToken(bearer(req) ?? ''))) {
           fail(401, 'Valid ticket token required.');

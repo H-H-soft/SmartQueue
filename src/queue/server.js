@@ -12,6 +12,7 @@ let realtime;
 const events = {
   publish: (...args) => realtime.publish(...args),
   queueChanged: (...args) => realtime.queueChanged(...args),
+  adminLogout: (...args) => realtime.adminLogout(...args),
 };
 const app = createApp({ service, staffKey: process.env.STAFF_API_KEY, origin, events,
   geminiApiKey: process.env.GEMINI_API_KEY, geminiModel: process.env.GEMINI_MODEL });

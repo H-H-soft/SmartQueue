@@ -4,7 +4,25 @@ import { z } from 'zod';
 
 export function attachSockets(server, service, origin) {
   const io = new Server(server, { cors: { origin }, maxHttpBufferSize: 4096 });
+  io.use(async (socket, next) => {
+    try {
+      const token = socket.handshake.auth?.adminToken;
+      if (token) {
+        const session = await service.findAdminSession(token);
+        if (!session) return next(new Error('Administrator session expired.'));
+        socket.data.admin = session;
+      }
+      next();
+    } catch { next(new Error('Authentication unavailable.')); }
+  });
   io.on('connection', (socket) => {
+    if (socket.data.admin) {
+      const session = socket.data.admin;
+      socket.join('admins');
+      socket.join(`admin:${session.id}`);
+      const expiry = setTimeout(() => socket.disconnect(true), Math.max(0, new Date(session.expiresAt).getTime() - Date.now()));
+      socket.on('disconnect', () => clearTimeout(expiry));
+    }
     // A reconnect creates a fresh socket. Join first, then retrieve REST state.
     socket.on('subscribe', async (input, ack) => {
       if (typeof ack !== 'function') return;
@@ -37,6 +55,9 @@ export function attachSockets(server, service, origin) {
 
   return {
     io,
+    async adminLogout(id) {
+      io.in(`admin:${id}`).disconnectSockets(true);
+    },
     async publish(event, ticket) {
       // Public announcements deliberately omit ticket UUIDs, profiles and credentials.
       const payload = { event, serviceId: ticket.serviceId, ticketNumber: ticket.number,
@@ -44,6 +65,11 @@ export function attachSockets(server, service, origin) {
       io.to([`queue:${ticket.serviceId}`, `ticket:${ticket.id}`]).emit(event, payload);
       const state = await service.ticketState(ticket.id);
       io.to(`ticket:${ticket.id}`).emit('TICKET_UPDATED', { event: 'TICKET_UPDATED', ...state });
+      // Detailed requirements and requester locations are only sent to authenticated admins.
+      for (const socket of await io.in('admins').fetchSockets()) {
+        if (!await service.adminSessionActive(socket.data.admin.id)) { socket.disconnect(true); continue; }
+        socket.emit(event === 'TICKET_CREATED' ? 'ADMIN_TICKET_CREATED' : 'ADMIN_TICKET_UPDATED', { event, ticket: state });
+      }
       // A shared desk affects estimates in its other queues, too.
       const ids = new Set([ticket.serviceId]);
       for (const desk of await service.listDesks()) {

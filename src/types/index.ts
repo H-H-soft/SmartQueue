@@ -197,6 +197,37 @@ export interface QueueTicket {
   positionInQueue: number | null;
   estimatedWaitMinutes: number | null;
   estimateIsApproximate: boolean;
+  helpSummary: string | null;
+  helpRequirements: string | null;
+  requesterLocationId: string | null;
+  requesterLocation: TicketLocation | null;
+  claimedById: string | null;
+  claimedBy: { id: string; name: string; expiresAt: string; revokedAt: string | null } | null;
+  claimedAt: string | null;
+  helpCompletedAt: string | null;
+}
+
+export interface TicketLocation {
+  id: string;
+  name: string;
+  buildingId: string;
+  buildingName: string;
+  floorId: string;
+  floor: number;
+  floorName: string;
+  x: number;
+  y: number;
+}
+
+export interface AdminSession {
+  id: string;
+  name: string;
+  accessToken: string;
+  expiresAt: string;
+}
+
+export interface AdminTicket extends Omit<QueueTicket, 'visitorsAhead' | 'positionInQueue' | 'estimatedWaitMinutes' | 'estimateIsApproximate'> {
+  service?: { name: string };
 }
 
 export interface CreatedQueueTicket extends QueueTicket {

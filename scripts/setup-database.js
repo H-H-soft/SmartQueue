@@ -48,6 +48,12 @@ try {
       throw error;
     }
   }
+  // Additive upgrade for existing installations; never reset visitor tickets.
+  const hasAssistance = db.pragma('table_info(Ticket)').some((column) => column.name === 'helpSummary');
+  if (!hasAssistance) {
+    const migration = await readFile(new URL('../prisma/migrations/20261124000000_ticket_assistance/migration.sql', import.meta.url), 'utf8');
+    db.transaction(() => db.exec(migration))();
+  }
 } finally {
   db.close();
 }

@@ -84,9 +84,26 @@ model Ticket {
   calledAt  DateTime?
   startedAt DateTime?
   endedAt   DateTime?
+  helpSummary String?
+  helpRequirements String?
+  requesterLocationId String?
+  claimedById String?
+  claimedBy AdminSession? @relation(fields: [claimedById], references: [id])
+  claimedAt DateTime?
+  helpCompletedAt DateTime?
 
   @@unique([serviceId, sequence])
   @@index([serviceId, status, sequence])
   @@index([deskId, status])
   @@index([accountId, createdAt])
+}
+
+model AdminSession {
+  id String @id @default(uuid())
+  name String
+  tokenHash String @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+  tickets Ticket[]
 }

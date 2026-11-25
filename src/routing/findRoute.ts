@@ -31,7 +31,6 @@ export function edgeCost(edge: Edge, profile: AccessibilityProfile): number | nu
   if (profile === 'wheelchair') {
     // Unknown geometry is not safe to advertise as a step-free route.
     if (edge.stepFree !== true || edge.mode === 'stairs') return null;
-    if (edge.stepFree === false || edge.mode === 'stairs') return null;
     if (edge.minWidth !== undefined && edge.minWidth < WHEELCHAIR_MIN_WIDTH) return null;
     if (edge.slope !== undefined && edge.slope > WHEELCHAIR_MAX_SLOPE) return null;
   }
