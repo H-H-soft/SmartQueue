@@ -39,7 +39,7 @@
       "floor": "airi-floor-2",
       "x": 468,
       "y": 151,
-      "label": "Parcare",
+      "label": "Scări de lemn · atrium",
       "type": "stairs"
     },
     {
@@ -547,7 +547,7 @@
     },
     {
       "nodeId": "f2-atrium-stairs",
-      "text": "Parcare"
+      "text": "Scări de lemn · atrium"
     },
     {
       "nodeId": "f2-hall-north",

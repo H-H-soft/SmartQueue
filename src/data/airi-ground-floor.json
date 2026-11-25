@@ -240,6 +240,14 @@
       "type": "corridor",
       "x": 135.1,
       "y": 605.88
+    },
+    {
+      "id": "g-atrium-stairs",
+      "floor": "airi-ground",
+      "type": "stairs",
+      "x": 385,
+      "y": 572.42,
+      "label": "Scări de lemn · atrium"
     }
   ],
   "edges": [
@@ -270,7 +278,7 @@
     {
       "from": "scan-12",
       "to": "scan-23",
-      "distance": 6.45,
+      "distance": 6.455,
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
@@ -294,7 +302,7 @@
     {
       "from": "scan-13",
       "to": "scan-23",
-      "distance": 4.75,
+      "distance": 4.747,
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
@@ -342,7 +350,7 @@
     {
       "from": "scan-14",
       "to": "scan-23",
-      "distance": 5.86,
+      "distance": 5.861,
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
@@ -422,14 +430,14 @@
     {
       "from": "scan-23",
       "to": "scan-24",
-      "distance": 4.3,
+      "distance": 4.298,
       "mode": "walk",
       "stepFree": null
     },
     {
       "from": "scan-23",
       "to": "scan-25",
-      "distance": 6.91,
+      "distance": 6.914,
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
@@ -437,7 +445,7 @@
     {
       "from": "scan-23",
       "to": "scan-31",
-      "distance": 3.32,
+      "distance": 3.322,
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
@@ -625,6 +633,13 @@
       "mode": "walk",
       "stepFree": null,
       "wheelchairAllowedByUser": true
+    },
+    {
+      "from": "scan-23",
+      "to": "g-atrium-stairs",
+      "distance": 1.874,
+      "mode": "walk",
+      "stepFree": null
     }
   ],
   "landmarks": [
@@ -663,6 +678,10 @@
     {
       "nodeId": "scan-22",
       "text": "Ușă cu indicator luminos EXIT"
+    },
+    {
+      "nodeId": "g-atrium-stairs",
+      "text": "Scări de lemn · atrium"
     }
   ]
 }

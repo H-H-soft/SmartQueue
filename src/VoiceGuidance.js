@@ -312,44 +312,54 @@
     'scan-31': ['turnicheti', 'turnichet'],
     'scan-178': ['camera 105', '105'],
   };
+  let pendingRouteDestination = null;
   function findNamedLandmark(question, excludedId, fromEnd = false) {
     const q = plain(question);
     let best = null, bestIndex = fromEnd ? -1 : Infinity, bestLength = 0;
     mapLandmarks.filter(item => item.id !== excludedId).forEach(item => {
       const names = [plain(item.label), ...(landmarkAliases[item.id] || [])];
+      // Recognize natural room names such as “sala 110”, “S110” or “camera 105”.
+      const room = item.label.match(/^(?:camera\s+)?(?:[SL]\s*)?(\d{3})\b/i);
+      if (room) names.push(room[1], 'sala ' + room[1], 'camera ' + room[1]);
       names.forEach(name => {
-        const index = name ? q.indexOf(name) : -1;
-        if (index >= 0 && (fromEnd ? index > bestIndex : index < bestIndex || (index === bestIndex && name.length > bestLength))) {
+        const index = name ? (fromEnd ? q.lastIndexOf(name) : q.indexOf(name)) : -1;
+        if (index < 0 || (index > 0 && /[a-z0-9]/.test(q[index - 1])) || /[a-z0-9]/.test(q[index + name.length] || '')) return;
+        if (fromEnd ? index > bestIndex || (index === bestIndex && name.length > bestLength) : index < bestIndex || (index === bestIndex && name.length > bestLength)) {
           best = item; bestIndex = index; bestLength = name.length;
         }
       });
     });
     return best;
   }
+  function setRequestedRoute(origin, destination) {
+    pendingRouteDestination = null;
+    global.dispatchEvent(new CustomEvent('smartqueue-route-origin', { detail: { nodeId: origin.id } }));
+    global.dispatchEvent(new CustomEvent('smartqueue-route-destination', { detail: { nodeId: destination.id } }));
+    return 'Am setat plecarea la ' + origin.label + ' și destinația la ' + destination.label + '. Aplicația calculează traseul pe hartă. Dacă nu există o rută pentru profilul ales, vei vedea mesajul pe ecran.';
+  }
   function routeOriginAnswer(question) {
     const q = plain(question);
-    if (!/\b(sunt|ma aflu|am ajuns|ma gasesc)\b/.test(q)) return null;
+    if (!/\b(sunt|ma aflu|am ajuns|ma gasesc)\b/.test(q) && !pendingRouteDestination) return null;
     const location = findNamedLandmark(q);
     if (!location) return null;
-    const destination = /\b(vreau|as vrea|ajung|merg|du ma|condu ma|destinatie)\b/.test(q)
-      ? findNamedLandmark(q, location.id, true)
-      : null;
+    const destination = findNamedLandmark(q, location.id, true) || pendingRouteDestination;
+    if (destination && destination.id !== location.id) return setRequestedRoute(location, destination);
     global.dispatchEvent(new CustomEvent('smartqueue-route-origin', { detail: { nodeId: location.id } }));
-    if (destination) {
-      global.dispatchEvent(new CustomEvent('smartqueue-route-destination', { detail: { nodeId: destination.id } }));
-      return `Am setat plecarea la ${location.label} și destinația la ${destination.label}. Se calculează traseul. Spune „ce urmează” pentru prima indicație.`;
-    }
-    if (routeContext?.steps?.length) return `Am schimbat plecarea la ${location.label} și aplicația recalculează drumul spre ${routeContext.destination}. Spune „ce urmează” ca să auzi prima indicație.`;
-    return `Am setat plecarea la ${location.label}. Spune-mi unde vrei să ajungi.`;
+    if (routeContext?.steps?.length) return 'Am schimbat plecarea la ' + location.label + '. Aplicația recalculează traseul spre ' + routeContext.destination + '.';
+    return 'Am setat plecarea la ' + location.label + '. Spune-mi unde vrei să ajungi.';
   }
   function routeDestinationAnswer(question) {
     const q = plain(question);
-    if (!/\b(vreau|as vrea|ajung|merg|du ma|condu ma|traseu|ruta|destinatie)\b/.test(q)) return null;
+    if (!/\b(vreau|as vrea|ajung|merg|du ma|condu ma|traseu|ruta|destinatie|directii|drum|unde este|unde e)\b/.test(q)) return null;
     const destination = findNamedLandmark(q, undefined, true);
-    if (!destination) return null;
+    if (!destination) return 'Nu am identificat destinația pe hartă. Spune numele reperului sau numărul sălii, de exemplu „sala 110”.';
+    const from = q.match(/\b(?:de la|din|from)\s+(.+)/);
+    const origin = from ? findNamedLandmark(from[1], destination.id) : null;
+    if (origin) return setRequestedRoute(origin, destination);
     global.dispatchEvent(new CustomEvent('smartqueue-route-destination', { detail: { nodeId: destination.id } }));
-    if (routeContext?.steps?.length) return `Am schimbat destinația la ${destination.label}. Aplicația recalculează ruta de la ${routeContext.origin}. Spune „ce urmează” pentru prima indicație.`;
-    return `Am selectat ${destination.label} ca destinație și deschid traseul de la intrarea principală. Spune „ce urmează” după ce se încarcă ruta.`;
+    if (routeContext?.steps?.length) return 'Am schimbat destinația la ' + destination.label + '. Aplicația recalculează ruta de la ' + routeContext.origin + '.';
+    pendingRouteDestination = destination;
+    return 'Am selectat destinația ' + destination.label + ' pe hartă. De unde pleci? Spune un reper, de exemplu „sunt la intrare”.';
   }
   function routeProgressAnswer(q) {
     if (/(repeta|repeti|din nou|indicatia curenta|pasul curent|directia actuala)/.test(q)) {

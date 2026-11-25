@@ -35,7 +35,7 @@ export const schemas = {
       floor: z.string().max(80), origin: z.string().max(180), destination: z.string().max(180),
       currentStepIndex: z.number().int().min(0).max(99), currentStep: z.string().max(400),
       steps: z.array(z.object({ action: z.enum(['walk', 'turn', 'elevator', 'stairs', 'ramp', 'arrive']), text: z.string().min(1).max(400), distance: z.number().nonnegative().max(10000).optional(), landmark: z.string().max(180).optional() }).strict()).min(1).max(100),
-      totalDistance: z.number().nonnegative().max(100000), verified: z.literal(false), locationDetected: z.literal(false),
+      totalDistance: z.number().nonnegative().max(100000).optional(), verified: z.literal(false), locationDetected: z.literal(false),
       landmarks: z.array(z.object({ id, label: z.string().min(1).max(180) }).strict()).max(30).optional(),
     }).strict().optional(),
   }).strict(),

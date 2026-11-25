@@ -6,7 +6,9 @@ export function connectAiriFloors(ground: Building, upper: Building): Building {
     { id: 'g-stone-stairs', floor: 'airi-ground', type: 'stairs', x: 289.7, y: 540, markerOffsetX: -19.7, label: 'Scara de piatră · parter' },
     { id: 'g-wing-stairs', floor: 'airi-ground', type: 'stairs', x: 565, y: 614, label: 'Scară închisă · aripa dreaptă' },
   ];
-  const nodes = [...ground.nodes, ...upper.nodes, ...approaches];
+  const atriumStairs = ground.nodes.filter(n => n.id === 'g-atrium-stairs');
+  // Keep existing landmark numbers; the new ground-floor stairs are point 12.
+  const nodes = [...ground.nodes.filter(n => n.id !== 'g-atrium-stairs'), ...upper.nodes, ...approaches, ...atriumStairs];
   const byId = new Map(nodes.map(n => [n.id, n]));
   const approachLinks: Edge[] = [['scan-26', 'g-stone-stairs'], ['scan-27', 'g-stone-stairs'], ['scan-17', 'g-wing-stairs']].map(([from, to]) => {
     const a = byId.get(from)!, b = byId.get(to)!;
@@ -15,7 +17,7 @@ export function connectAiriFloors(ground: Building, upper: Building): Building {
   const transitions: Edge[] = [
     { from: 'scan-26', to: 'f2-lifts', mode: 'elevator', distance: 0, routingCost: 80, stepFree: null, wheelchairAllowedByUser: true, transitionName: 'lifturile centrale' },
     { from: 'g-stone-stairs', to: 'f2-stone-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara de piatră' },
-    { from: 'scan-23', to: 'f2-atrium-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara de lemn a atriumului' },
+    { from: 'g-atrium-stairs', to: 'f2-atrium-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara de lemn a atriumului' },
     { from: 'g-wing-stairs', to: 'f2-enclosed-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara închisă din aripa dreaptă' },
   ];
   // Compare both plans in approximate common drawing units. This is a routing

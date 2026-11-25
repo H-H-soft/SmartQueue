@@ -22,7 +22,13 @@ const VIEW_PADDING_X = 48;
 const VIEW_PADDING_Y = 44;
 
 function pointsAttribute(nodes: GraphNode[]) {
-  return nodes.map((node) => `${node.x},${node.y}`).join(' ');
+  return nodes.flatMap((node, index) => {
+    const anchor = `${node.x},${node.y}`;
+    if (!node.markerOffsetX && !node.markerOffsetY) return [anchor];
+    const marker = `${node.x + (node.markerOffsetX ?? 0)},${node.y + (node.markerOffsetY ?? 0)}`;
+    // Retain the corridor fork and extend the route to its displaced marker.
+    return index === nodes.length - 1 ? [anchor, marker] : [anchor, marker, anchor];
+  }).join(' ');
 }
 
 function largestConnectedComponent(nodes: GraphNode[], edges: Edge[]) {
@@ -282,19 +288,6 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               })}
             </g>
 
-            {mapLandmarks
-              .filter(({ node }) => node.id !== userPosition?.id && (!route || (node.id !== start?.id && node.id !== destination?.id)))
-              .map(({ node, label, number }) => {
-              const selected = node.id === startNodeId || node.id === destinationNodeId;
-              const markerX = node.x + (node.markerOffsetX ?? 0);
-              return <g key={node.id} className={`indoor-map__landmark${selected ? ' is-selected' : ''}`} role={onNodeSelect ? 'button' : undefined} tabIndex={onNodeSelect ? 0 : undefined} aria-label={onNodeSelect ? `${number}. Alege ${label}` : label} onClick={onNodeSelect ? () => onNodeSelect(node.id) : undefined} onKeyDown={onNodeSelect ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onNodeSelect(node.id); } } : undefined}>
-                <title>{`${number}. ${label}`}</title>
-                <circle className="indoor-map__landmark-hit" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r="19" />
-                <circle className="indoor-map__landmark-dot" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r={selected ? 11 : 9} />
-                <text className="indoor-map__landmark-number" x={markerX} y={node.y + (node.markerOffsetY ?? 0) + 4} textAnchor="middle">{number}</text>
-              </g>;
-            })}
-
             {routeNodes.length > 1 && <>
               <polyline className="indoor-map__route-underlay" points={pointsAttribute(routeNodes)} />
               <polyline
@@ -308,6 +301,19 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               points={pointsAttribute(activePath)}
               aria-hidden="true"
             />}
+
+            {mapLandmarks
+              .filter(({ node }) => node.id !== userPosition?.id && (!route || (node.id !== start?.id && node.id !== destination?.id)))
+              .map(({ node, label, number }) => {
+              const selected = node.id === startNodeId || node.id === destinationNodeId;
+              const markerX = node.x + (node.markerOffsetX ?? 0);
+              return <g key={node.id} className={`indoor-map__landmark${selected ? ' is-selected' : ''}${routeNodes.some(routeNode => routeNode.id === node.id) ? ' is-on-route' : ''}`} role={onNodeSelect ? 'button' : undefined} tabIndex={onNodeSelect ? 0 : undefined} aria-label={onNodeSelect ? `${number}. Alege ${label}` : label} onClick={onNodeSelect ? () => onNodeSelect(node.id) : undefined} onKeyDown={onNodeSelect ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onNodeSelect(node.id); } } : undefined}>
+                <title>{`${number}. ${label}`}</title>
+                <circle className="indoor-map__landmark-hit" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r="19" />
+                <circle className="indoor-map__landmark-dot" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r={routeNodes.some(routeNode => routeNode.id === node.id) ? 12 : selected ? 11 : 9} />
+                <text className="indoor-map__landmark-number" x={markerX} y={node.y + (node.markerOffsetY ?? 0) + 4} textAnchor="middle">{number}</text>
+              </g>;
+            })}
 
             {turns.map((turn) => turn.node && (
               <g key={turn.id} className={`indoor-map__turn-marker${turn.active ? ' is-current' : ''}`} transform={`translate(${turn.node.x} ${turn.node.y})`}>

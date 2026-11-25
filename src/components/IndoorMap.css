@@ -302,3 +302,8 @@
 
 .map-zoom { flex-wrap: wrap; }
 .map-zoom button[aria-pressed="true"] { background: #dcefe4; color: #12472f; }
+
+.indoor-map__landmark.is-on-route .indoor-map__landmark-dot { fill: #f8c643; stroke: #fff; stroke-width: 2.5; filter: drop-shadow(0 0 4px #f8c643aa); }
+.indoor-map__landmark.is-on-route .indoor-map__landmark-number { fill: #29351b; }
+
+.indoor-map__landmark.is-on-route .indoor-map__landmark-number { font-size: 9px; font-weight: 900; }
