@@ -295,8 +295,14 @@ function GuidancePage({ desk, profile, startId, destinationId, setStartId, setDe
   const [currentStep, setCurrentStep] = useState(0);
   const [voiceStatus, setVoiceStatus] = useState('');
 
-  useEffect(() => { setCurrentStep(0); setVoiceStatus(''); window.speechSynthesis?.cancel(); }, [startId, activeDestination, profile]);
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  const mapSpeech = useRef<SpeechSynthesisUtterance | null>(null);
+  function stopMapSpeech() {
+    if (!mapSpeech.current) return;
+    mapSpeech.current = null;
+    window.speechSynthesis?.cancel();
+  }
+  useEffect(() => { setCurrentStep(0); setVoiceStatus(''); stopMapSpeech(); }, [startId, activeDestination, profile]);
+  useEffect(() => () => stopMapSpeech(), []);
 
   const currentStepIndex = route?.steps.length ? Math.min(currentStep, route.steps.length - 1) : 0;
   const currentRouteStep = route?.steps[currentStepIndex];
@@ -331,6 +337,10 @@ function GuidancePage({ desk, profile, startId, destinationId, setStartId, setDe
     if (!('speechSynthesis' in window)) { setVoiceStatus('Citirea vocală nu este disponibilă în acest browser.'); return; }
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
+    mapSpeech.current = utterance;
+    const release = () => { if (mapSpeech.current === utterance) mapSpeech.current = null; };
+    utterance.onend = release;
+    utterance.onerror = release;
     utterance.lang = 'ro-RO';
     utterance.rate = 0.88;
     window.speechSynthesis.speak(utterance);

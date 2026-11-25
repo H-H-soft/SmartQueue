@@ -135,7 +135,10 @@
   async function speakOnce(text) {
     if (!voiceMode) return;
     silence(); state = 'stopped'; const my = ++session; clearMark(); render(); say(text);
-    await speakChunk(text, my);
+    for (const chunk of sentences(text)) {
+      if (my !== session || !voiceMode) break;
+      await speakChunk(chunk, my);
+    }
   }
 
   // ---------- compact, task-focused visitor assistant
@@ -305,14 +308,39 @@
     'scan-11': ['intrare', 'intrarea principala'],
     'scan-16': ['usa cu simbol', 'simbol de accesibilitate'],
     'scan-22': ['iesire', 'exit'],
-    'scan-23': ['gradene', 'gradena'],
-    'scan-24': ['atrium', 'atriu'],
+    'scan-23': ['turnicheti', 'turnichet', 'porti de acces'],
+    'scan-24': ['receptie', 'tejghea'],
     'scan-26': ['lift', 'ascensor'],
-    'scan-29': ['receptie', 'tejghea'],
-    'scan-31': ['turnicheti', 'turnichet'],
     'scan-178': ['camera 105', '105'],
   };
   let pendingRouteDestination = null;
+  let requestedRouteReply = null;
+  function describeRoute(route) {
+    return `Traseul de la ${route.origin} la ${route.destination}. ` +
+      route.steps.map((step, index) => `Pasul ${index + 1}: ${step.text}`).join(' ') +
+      ' Poți spune „repetă” pentru pasul curent sau „am ajuns” pentru următorul pas. Nu detectez automat poziția ta.';
+  }
+  function waitForRequestedRoute() {
+    requestedRouteReply = new Promise(resolve => {
+      let settleTimer;
+      const finish = route => {
+        clearTimeout(timeout);
+        clearTimeout(settleTimer);
+        global.removeEventListener('smartqueue-route-context', onContext);
+        if (route?.steps?.length) pendingRouteDestination = null;
+        resolve(route?.steps?.length ? describeRoute(route) :
+          'Nu există un traseu disponibil pentru punctele și profilul alese. Alege alte puncte sau cere ajutor personalului.');
+      };
+      const onContext = event => {
+        clearTimeout(settleTimer);
+        // Read after React has committed the route and finished cancelling old speech.
+        settleTimer = setTimeout(() => finish(event.detail), 0);
+      };
+      global.addEventListener('smartqueue-route-context', onContext);
+      // Selecting the same route does not trigger a new React effect.
+      const timeout = setTimeout(() => finish(routeContext), 1500);
+    });
+  }
   function findNamedLandmark(question, excludedId, fromEnd = false) {
     const q = plain(question);
     let best = null, bestIndex = fromEnd ? -1 : Infinity, bestLength = 0;
@@ -333,6 +361,7 @@
   }
   function setRequestedRoute(origin, destination) {
     pendingRouteDestination = null;
+    waitForRequestedRoute();
     global.dispatchEvent(new CustomEvent('smartqueue-route-origin', { detail: { nodeId: origin.id } }));
     global.dispatchEvent(new CustomEvent('smartqueue-route-destination', { detail: { nodeId: destination.id } }));
     return 'Am setat plecarea la ' + origin.label + ' și destinația la ' + destination.label + '. Aplicația calculează traseul pe hartă. Dacă nu există o rută pentru profilul ales, vei vedea mesajul pe ecran.';
@@ -344,6 +373,7 @@
     if (!location) return null;
     const destination = findNamedLandmark(q, location.id, true) || pendingRouteDestination;
     if (destination && destination.id !== location.id) return setRequestedRoute(location, destination);
+    if (routeContext?.steps?.length) waitForRequestedRoute();
     global.dispatchEvent(new CustomEvent('smartqueue-route-origin', { detail: { nodeId: location.id } }));
     if (routeContext?.steps?.length) return 'Am schimbat plecarea la ' + location.label + '. Aplicația recalculează traseul spre ' + routeContext.destination + '.';
     return 'Am setat plecarea la ' + location.label + '. Spune-mi unde vrei să ajungi.';
@@ -356,6 +386,9 @@
     const from = q.match(/\b(?:de la|din|from)\s+(.+)/);
     const origin = from ? findNamedLandmark(from[1], destination.id) : null;
     if (origin) return setRequestedRoute(origin, destination);
+    // The guidance view may not be mounted yet on the first question.
+    // Wait for its initial route too, not only updates to an existing route.
+    waitForRequestedRoute();
     global.dispatchEvent(new CustomEvent('smartqueue-route-destination', { detail: { nodeId: destination.id } }));
     if (routeContext?.steps?.length) return 'Am schimbat destinația la ' + destination.label + '. Aplicația recalculează ruta de la ' + routeContext.origin + '.';
     pendingRouteDestination = destination;
@@ -382,6 +415,9 @@
   }
   function answerQuestion(question) {
     const q = plain(question);
+    if (/(citeste|spune|repeta|ascult).*(traseu|ruta)|(traseu|ruta).*(voce|tare)/.test(q)) {
+      return routeContext?.steps?.length ? describeRoute(routeContext) : 'Alege plecarea și destinația ca să îți pot citi traseul.';
+    }
     const routeOrigin = routeOriginAnswer(question);
     if (routeOrigin) return routeOrigin;
     const routeDestination = routeDestinationAnswer(question);
@@ -459,7 +495,11 @@
       voiceMode = false;
       recognition?.abort();
       reply = 'Am oprit conversația vocală. Poți folosi aplicația și asistentul prin butoane sau text.';
-      } else reply = answerQuestion(text);
+      } else {
+        requestedRouteReply = null;
+        reply = answerQuestion(text);
+        if (requestedRouteReply) reply = await requestedRouteReply;
+      }
     if (!reply) {
       if (/[\w.+-]+@[\w.-]+\.[a-z]{2,}|(?:\+?\d[\d\s().-]{7,}\d)/i.test(text)) {
         reply = 'Întrebarea pare să conțină un e-mail sau un număr de telefon. Ca să-ți protejez datele, nu o trimit către AI. Reformulează fără date personale.';

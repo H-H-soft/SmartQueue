@@ -124,7 +124,7 @@
       "type": "waiting_area",
       "x": 403.74,
       "y": 572.42,
-      "label": "Gradenele atriumului"
+      "label": "Turnicheții de acces"
     },
     {
       "id": "scan-24",
@@ -132,7 +132,7 @@
       "type": "junction",
       "x": 403.76,
       "y": 529.44,
-      "label": "Atrium"
+      "label": "Recepție"
     },
     {
       "id": "scan-25",
@@ -170,8 +170,7 @@
       "floor": "airi-ground",
       "type": "desk",
       "x": 334.63,
-      "y": 607.66,
-      "label": "Recepție · tejghea"
+      "y": 607.66
     },
     {
       "id": "scan-30",
@@ -185,8 +184,7 @@
       "floor": "airi-ground",
       "type": "junction",
       "x": 402.83,
-      "y": 605.63,
-      "label": "Turnicheții de acces"
+      "y": 605.63
     },
     {
       "id": "scan-32",
@@ -653,23 +651,15 @@
     },
     {
       "nodeId": "scan-23",
-      "text": "Gradenele atriumului"
+      "text": "Turnicheții de acces"
     },
     {
       "nodeId": "scan-24",
-      "text": "Zona centrală a atriumului"
+      "text": "Recepție"
     },
     {
       "nodeId": "scan-26",
       "text": "Liftul de la parter"
-    },
-    {
-      "nodeId": "scan-29",
-      "text": "Tejgheaua de recepție"
-    },
-    {
-      "nodeId": "scan-31",
-      "text": "Turnicheții de acces"
     },
     {
       "nodeId": "scan-178",
