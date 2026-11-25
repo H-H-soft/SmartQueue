@@ -147,6 +147,8 @@
       "type": "elevator",
       "x": 289.77,
       "y": 528.95,
+      "markerOffsetY": -16,
+      "markerOffsetX": -19.77,
       "label": "Lift"
     },
     {
@@ -206,6 +208,9 @@
       "type": "junction",
       "x": 281.23,
       "y": 607.24,
+      "networkX": 289.63,
+      "markerOffsetX": 2.77,
+      "markerOffsetY": 3.76,
       "label": "Camera 105"
     },
     {
@@ -497,6 +502,7 @@
     {
       "from": "scan-27",
       "to": "scan-179",
+      "hiddenOnMap": true,
       "distance": 6.14,
       "mode": "walk",
       "stepFree": null,

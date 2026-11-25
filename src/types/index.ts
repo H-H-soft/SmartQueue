@@ -55,6 +55,9 @@ export interface GraphNode {
   x: number;
   y: number;
   label?: string;
+  markerOffsetY?: number; // Visual offset for the map marker only.
+  markerOffsetX?: number;
+  networkX?: number; // Schematic horizontal position for background connections.
   areaId?: string;
   areaLabel?: string;
   deskId?: string;   // doar pentru type = 'desk'
@@ -63,6 +66,7 @@ export interface GraphNode {
 export type EdgeMode = 'walk' | 'elevator' | 'stairs' | 'ramp';
 
 export interface Edge {
+  hiddenOnMap?: boolean; // Omit from the background network drawing.
   routingCost?: number; // Optional comparable routing weight; not a measured distance.
   transitionName?: string;
   from: string;      // id nod

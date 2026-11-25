@@ -3,7 +3,7 @@ import type { Building, Edge, GraphNode } from '../types';
 /** Join the user-identified landings. Approach positions are schematic, not surveyed. */
 export function connectAiriFloors(ground: Building, upper: Building): Building {
   const approaches: GraphNode[] = [
-    { id: 'g-stone-stairs', floor: 'airi-ground', type: 'stairs', x: 289.7, y: 540, label: 'Scara de piatră · parter' },
+    { id: 'g-stone-stairs', floor: 'airi-ground', type: 'stairs', x: 289.7, y: 540, markerOffsetX: -19.7, label: 'Scara de piatră · parter' },
     { id: 'g-wing-stairs', floor: 'airi-ground', type: 'stairs', x: 565, y: 614, label: 'Scară închisă · aripa dreaptă' },
   ];
   const nodes = [...ground.nodes, ...upper.nodes, ...approaches];

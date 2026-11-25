@@ -184,7 +184,7 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
   const connectedEdges = floorEdges.filter((edge) => connectedIds.has(edge.from) && connectedIds.has(edge.to));
   const mainEntrance = mapNodes.find((node) => node.type === 'entrance') ?? mapNodes[0];
   const mapEdges = useMemo(
-    () => shortestPathTree(mapNodes, connectedEdges, mainEntrance?.id),
+    () => shortestPathTree(mapNodes, connectedEdges, mainEntrance?.id).filter((edge) => !edge.hiddenOnMap),
     [connectedEdges, mainEntrance?.id, mapNodes],
   );
 
@@ -271,14 +271,14 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               {mapEdges.map((edge) => {
                 const from = nodesById.get(edge.from)!;
                 const to = nodesById.get(edge.to)!;
-                return <line key={`${edge.from}-${edge.to}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />;
+                return <line key={`${edge.from}-${edge.to}`} x1={from.networkX ?? from.x} y1={from.y} x2={to.networkX ?? to.x} y2={to.y} />;
               })}
             </g>
             <g className="indoor-map__network-core" aria-hidden="true">
               {mapEdges.map((edge) => {
                 const from = nodesById.get(edge.from)!;
                 const to = nodesById.get(edge.to)!;
-                return <line key={`${edge.from}-${edge.to}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />;
+                return <line key={`${edge.from}-${edge.to}`} x1={from.networkX ?? from.x} y1={from.y} x2={to.networkX ?? to.x} y2={to.y} />;
               })}
             </g>
 
@@ -286,11 +286,12 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               .filter(({ node }) => node.id !== userPosition?.id && (!route || (node.id !== start?.id && node.id !== destination?.id)))
               .map(({ node, label, number }) => {
               const selected = node.id === startNodeId || node.id === destinationNodeId;
+              const markerX = node.x + (node.markerOffsetX ?? 0);
               return <g key={node.id} className={`indoor-map__landmark${selected ? ' is-selected' : ''}`} role={onNodeSelect ? 'button' : undefined} tabIndex={onNodeSelect ? 0 : undefined} aria-label={onNodeSelect ? `${number}. Alege ${label}` : label} onClick={onNodeSelect ? () => onNodeSelect(node.id) : undefined} onKeyDown={onNodeSelect ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onNodeSelect(node.id); } } : undefined}>
                 <title>{`${number}. ${label}`}</title>
-                <circle className="indoor-map__landmark-hit" cx={node.x} cy={node.y} r="19" />
-                <circle className="indoor-map__landmark-dot" cx={node.x} cy={node.y} r={selected ? 11 : 9} />
-                <text className="indoor-map__landmark-number" x={node.x} y={node.y + 4} textAnchor="middle">{number}</text>
+                <circle className="indoor-map__landmark-hit" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r="19" />
+                <circle className="indoor-map__landmark-dot" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r={selected ? 11 : 9} />
+                <text className="indoor-map__landmark-number" x={markerX} y={node.y + (node.markerOffsetY ?? 0) + 4} textAnchor="middle">{number}</text>
               </g>;
             })}
 
