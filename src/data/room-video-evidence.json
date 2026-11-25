@@ -1,0 +1,14 @@
+{
+  "source": "Virtual Tour _ AIRi @ UTCN - Google Chrome 2026-11-24 22-17-23.mp4",
+  "positionMethod": "Approximate corridor-side approaches inferred from continuous movement and previously supplied floor overviews; not measured doorway coordinates.",
+  "rooms": [
+    { "nodeId": "f2-room-s108", "number": "S 108", "matterportFloor": 2, "timeSeconds": 146, "location": "Atrium passage, near the wooden stair landing", "status": "mapped_approximately" },
+    { "nodeId": "f2-room-s109", "number": "S 109", "matterportFloor": 2, "timeSeconds": 157, "location": "Atrium passage before S 110", "status": "mapped_approximately" },
+    { "nodeId": "f2-room-s110", "number": "S 110", "matterportFloor": 2, "timeSeconds": 158, "location": "End of atrium passage, before the right-wing doorway", "status": "mapped_approximately" },
+    { "nodeId": "f2-room-l103", "number": "L 103", "matterportFloor": 2, "timeSeconds": 161, "location": "Vodafone Innovation Hub doorway at right-wing entry", "status": "mapped_approximately" },
+    { "nodeId": "f2-room-l102", "number": "L 102", "matterportFloor": 2, "timeSeconds": 172, "location": "Beyond the Vodafone mural in the right wing", "status": "mapped_approximately" },
+    { "nodeId": "f2-room-l101", "number": "L 101", "matterportFloor": 2, "timeSeconds": 180, "location": "Right-wing glazed end, near enclosed stair access", "status": "mapped_approximately" },
+    { "number": "S 005", "matterportFloor": 1, "timeSeconds": 85, "location": "Near central stone stairs", "status": "awaiting_map_location" }
+  ],
+  "unresolved": [{ "timeSeconds": 152, "reason": "Door number appears different from S 108 at 146 seconds; do not add a separate room without clearer evidence." }]
+}

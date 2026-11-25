@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { AccessibilityProfile, Building, QueueTicket } from './types';
 import type { AccountSummary, AccountTicketSummary } from './account';
 import { clearAccountSession, readAccountSession, saveAccountSession } from './account';
@@ -9,6 +9,9 @@ import BrandMark from './components/BrandMark';
 import Icon from './components/Icon';
 import IndoorMap from './components/IndoorMap';
 import airiGroundFloor from './data/airi-ground-floor.json';
+import { floorTwoBuilding } from './data/airi-floor-2';
+import { connectAiriFloors } from './data/connect-floors';
+import { findRoute } from './routing/findRoute';
 import './App.css';
 
 type AppView = 'home' | 'queue' | 'guidance' | 'accessibility' | 'staff' | 'account';
@@ -18,11 +21,12 @@ const VIEW_LABELS: Record<AppView, string> = {
 };
 const PROFILES: { value: AccessibilityProfile; label: string; help: string }[] = [
   { value: 'standard', label: 'Standard', help: 'Preferi trasee uzuale.' },
-  { value: 'wheelchair', label: 'Scaun cu rotile', help: 'Evită scările. Folosește doar trasee fără trepte confirmate.' },
+  { value: 'wheelchair', label: 'Scaun cu rotile', help: 'Evită scările. Include culoarele activate în aplicație; accesul fizic rămâne de confirmat.' },
   { value: 'visual', label: 'Deficiență de vedere', help: 'Prioritizează indicații audio și repere descrise.' },
   { value: 'reduced', label: 'Mobilitate redusă', help: 'Prioritizează distanțe mai scurte și evitarea scărilor.' },
 ];
 const AIRI_GROUND_FLOOR = airiGroundFloor as Building & { source: { accessibilityVerified: boolean } };
+const AIRI_BUILDING = connectAiriFloors(AIRI_GROUND_FLOOR, floorTwoBuilding);
 
 function readView(): AppView {
   const view = window.location.hash.slice(1);
@@ -82,7 +86,7 @@ export default function App() {
   useEffect(() => { window.localStorage.setItem('smartqueue-large-text', JSON.stringify(largeText)); }, [largeText]);
 
   useEffect(() => {
-    const landmarks = AIRI_GROUND_FLOOR.nodes.flatMap((node) => node.label ? [{ id: node.id, label: node.label }] : []);
+    const landmarks = AIRI_BUILDING.nodes.flatMap((node) => node.label ? [{ id: node.id, label: node.label }] : []);
     const appWindow = window as Window & { smartqueueMapLandmarks?: typeof landmarks };
     appWindow.smartqueueMapLandmarks = landmarks;
     window.dispatchEvent(new CustomEvent('smartqueue-map-landmarks', { detail: landmarks }));
@@ -173,6 +177,7 @@ export default function App() {
 
   const frameClasses = ['app-frame', highContrast ? 'app-frame--high-contrast' : '', largeText ? 'app-frame--large-text' : ''].filter(Boolean).join(' ');
   const currentProfile = PROFILES.find((item) => item.value === profile) ?? PROFILES[1];
+
   return (
     <div className={frameClasses}>
       <aside className="app-sidebar" aria-label="Meniul SmartQueue">
@@ -255,16 +260,34 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
   startId: string; destinationId: string; setStartId: (value: string) => void;
   setDestinationId: (value: string) => void; goToQueue: () => void;
 }) {
-  const floor = AIRI_GROUND_FLOOR.floors[0];
-  const floorNodes = useMemo(() => AIRI_GROUND_FLOOR.nodes.filter((node) => node.floor === floor.id), [floor.id]);
-  const nodesById = useMemo(() => new Map(floorNodes.map((node) => [node.id, node])), [floorNodes]);
-  const locations = useMemo(() => floorNodes.filter((node) => node.label).map((node) => ({ node, label: node.label! })), [floorNodes]);
-  const deskMatchesFloor = Boolean(desk && desk.buildingId === AIRI_GROUND_FLOOR.id && desk.floor === floor.level && nodesById.has(desk.locationId));
+  const [visibleFloor, setVisibleFloor] = useState<1 | 2>(1);
+  const floorControlsRef = useRef<HTMLDivElement>(null);
+  const previousFloor = useRef(visibleFloor);
+  useLayoutEffect(() => {
+    if (previousFloor.current !== visibleFloor) {
+      floorControlsRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+      previousFloor.current = visibleFloor;
+    }
+  }, [visibleFloor]);
+  const building = AIRI_BUILDING;
+  const floor = building.floors[visibleFloor - 1];
+  const schematic = floor.distanceUnit === 'schematic';
+  const nodesById = useMemo(() => new Map(building.nodes.map((node) => [node.id, node])), [building]);
+  const locations = useMemo(() => building.nodes.filter((node) => node.label).map((node) => ({ node, label: node.label! })), [building]);
+  const locationGroups = building.floors.map((item) => ({
+    floor: item,
+    locations: locations.filter(({ node }) => node.floor === item.id),
+  }));
+  const deskMatchesFloor = Boolean(desk && desk.buildingId === building.id && nodesById.has(desk.locationId));
   const activeDestination = destinationId || (deskMatchesFloor ? desk!.locationId : '');
   const directRoute = startId && activeDestination
-    ? findRoute(AIRI_GROUND_FLOOR, startId, activeDestination, profile)
+    ? findRoute(building, startId, activeDestination, profile)
     : null;
   const route = directRoute;
+  const originFloor = building.floors.find((item) => item.id === nodesById.get(startId)?.floor);
+  const destinationFloor = building.floors.find((item) => item.id === nodesById.get(activeDestination)?.floor);
+  const crossFloor = originFloor && destinationFloor && originFloor.id !== destinationFloor.id;
+  const routeIsSchematic = route?.distanceUnit === 'schematic';
   const accessibilityUnconfirmed = profile === 'wheelchair' && !AIRI_GROUND_FLOOR.source.accessibilityVerified;
   const startLabel = locations.find((item) => item.node.id === startId)?.label;
   const destinationLabel = destinationId
@@ -278,21 +301,23 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
 
   const currentStepIndex = route?.steps.length ? Math.min(currentStep, route.steps.length - 1) : 0;
   const currentRouteStep = route?.steps[currentStepIndex];
+  const instructionFloor = currentRouteStep?.fromFloor ?? nodesById.get(currentRouteStep?.nodeId ?? '')?.floor;
+  const instructionFloorName = building.floors.find(item => item.id === instructionFloor)?.name;
   useEffect(() => {
     const detail = route ? {
-      floor: floor.name,
+      floor: instructionFloorName ?? originFloor?.name ?? floor.name,
       origin: startLabel ?? 'Punctul de plecare ales pe plan',
       destination: destinationLabel ?? 'Punctul de sosire ales pe plan',
       currentStepIndex,
       currentStep: currentRouteStep?.text ?? '',
       steps: route.steps.map((step) => ({ action: step.action, text: step.text, landmark: step.landmark ?? locations.find((item) => item.node.id === step.nodeId)?.label ?? 'reperul de orientare' })),
-      totalDistance: Number(route.totalDistance.toFixed(2)),
+      ...(!routeIsSchematic ? { totalDistance: Number(route.totalDistance.toFixed(2)) } : {}),
       verified: false,
       locationDetected: false,
       landmarks: locations.map(({ node, label }) => ({ id: node.id, label })),
     } : null;
     window.dispatchEvent(new CustomEvent('smartqueue-route-context', { detail }));
-  }, [route, currentStepIndex, currentRouteStep, floor.name, startLabel, destinationLabel]);
+  }, [route, currentStepIndex, currentRouteStep, floor.name, startLabel, destinationLabel, visibleFloor, routeIsSchematic, originFloor?.name, instructionFloorName]);
   useEffect(() => () => {
     window.dispatchEvent(new CustomEvent('smartqueue-route-context', { detail: null }));
   }, []);
@@ -301,7 +326,7 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
     const advance = () => setCurrentStep((index) => Math.min(index + 1, (route?.steps.length ?? 1) - 1));
     window.addEventListener('smartqueue-route-next', advance);
     return () => window.removeEventListener('smartqueue-route-next', advance);
-  }, [route?.steps.length]);
+  }, [route?.steps.length, visibleFloor]);
 
   function speak(text: string) {
     if (!('speechSynthesis' in window)) { setVoiceStatus('Citirea vocală nu este disponibilă în acest browser.'); return; }
@@ -314,18 +339,22 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
   }
 
   return <section className="guidance-page guidance-page--map" aria-labelledby="page-heading">
-    <div className="dashboard-heading"><div><span className="eyebrow">TURUL VIRTUAL AIRI · PARTER</span><h1 id="page-heading" tabIndex={-1}>Găsește drumul</h1><p>Alege reperul unde te afli și destinația. Confirmă fiecare reper atins ca harta să-ți arate următorul pas.</p></div><span className="profile-context"><Icon name="accessibility" size={17} /> {profileLabel}</span></div>
+    <div className="dashboard-heading"><div><span className="eyebrow">TURUL VIRTUAL AIRI · {floor.name}</span><h1 id="page-heading" tabIndex={-1}>Găsește drumul</h1><p>Alege plecarea și destinația pentru a calcula automat cel mai scurt traseu disponibil pe hartă.</p></div><span className="profile-context"><Icon name="accessibility" size={17} /> {profileLabel}</span></div>
+    {schematic && <p className="route-data-note">Floor 2: trasee orientative după fotografii, calculate pe culoarele desenate. Pozițiile sunt aproximative; distanțele în metri nu sunt cunoscute. Reperele scărilor indică palierele și ușile, nu schimbă automat etajul.</p>}
+    {profile === 'wheelchair' && <p className="route-info">Toate culoarele cartografiate sunt activate pentru calculul traseelor în scaun rulant. Scările sunt excluse; accesibilitatea fizică nu este verificată.</p>}
     {desk && <div className="destination-card"><span className="destination-card__icon"><Icon name="staff" size={21} /></span><div><span className="eyebrow">DESTINAȚIA TICHETULUI TĂU</span><strong>{desk.name}</strong><p>{desk.floor === 0 ? 'Parter' : `Etajul ${desk.floor}`}</p></div><span className={`desk-status desk-status--${desk.status.toLowerCase()}`}>{desk.status === 'OPEN' ? 'Deschis' : desk.status === 'PAUSED' ? 'Pauză' : 'Închis'}</span></div>}
 
     <div className="route-planner">
-      <label className="route-planner__field"><span>PLECARE</span><select value={startId} onChange={(event) => setStartId(event.target.value)} aria-label="Punctul de plecare"><option value="">Alege reperul de lângă tine</option>{locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</select></label>
+      <label className="route-planner__field"><span>PLECARE</span><select value={startId} onChange={(event) => setStartId(event.target.value)} aria-label="Punctul de plecare"><option value="">Alege reperul de lângă tine</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={`Floor ${group.floor.level + 1} - ${group.floor.name}`}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
       <button type="button" className="route-swap" aria-label="Inversează plecarea și destinația" disabled={!startId || !activeDestination} onClick={() => { setStartId(activeDestination); setDestinationId(startId); }}>⇅</button>
-      <label className="route-planner__field"><span>DESTINAȚIE</span><select value={destinationId || (deskMatchesFloor ? desk!.locationId : '')} onChange={(event) => setDestinationId(event.target.value)} aria-label="Punctul de sosire"><option value="">Alege unde vrei să ajungi</option>{locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</select></label>
+      <label className="route-planner__field"><span>DESTINAȚIE</span><select value={destinationId || (deskMatchesFloor ? desk!.locationId : '')} onChange={(event) => setDestinationId(event.target.value)} aria-label="Punctul de sosire"><option value="">Alege unde vrei să ajungi</option>{locationGroups.map((group) => <optgroup key={group.floor.id} label={`Floor ${group.floor.level + 1} - ${group.floor.name}`}>{group.locations.map(({ node, label }) => <option key={node.id} value={node.id}>{label}</option>)}</optgroup>)}</select></label>
       <button type="button" className="route-clear" disabled={!startId && !destinationId} onClick={() => { setStartId(''); setDestinationId(''); }}>Resetează</button>
     </div>
     {desk && !deskMatchesFloor && <p className="route-info" role="status">Punctul acestui tichet nu este înregistrat pe plan, deci nu pot calcula un traseu până la el. Cere operatorului locul exact. Poți alege separat o plecare și o destinație marcate pe plan.</p>}
+    {crossFloor && route && <p className="route-info" role="status">Traseu între {originFloor.name} și {destinationFloor.name}. Urmează indicația pentru lift sau scară, apoi confirmă sosirea pe noul etaj. Butoanele hărții permit vizualizarea oricărui etaj fără să schimbe poziția confirmată. Alegerea traseului folosește lungimi aproximative pe schemă.</p>}
+    {route && !crossFloor && originFloor?.id !== floor.id && <p className="route-info" role="status">Traseul selectat este pe {originFloor?.name}. Folosește butoanele de deasupra hărții pentru a afișa acel etaj.</p>}
 
-    <p className="route-data-note">Punctul albastru arată ultimul reper ales sau confirmat. Harta se rotește astfel încât următoarea direcție să fie în sus. Confirmă reperul când ajungi acolo sau spune asistentului „sunt la lift”. Poziționarea automată în interior necesită balize instalate în clădire; GPS-ul obișnuit nu este suficient de precis.</p>
+    <p className="route-data-note">Punctul albastru arată ultimul reper ales sau confirmat. Activează „Urmărește direcția” pentru rotirea hărții. Confirmă reperul când ajungi acolo. Poziția nu este detectată automat.</p>
     {accessibilityUnconfirmed && route && <p className="route-warning" role="alert"><strong>Accesibilitatea traseului nu a fost verificată la fața locului.</strong> Modelul nu confirmă pragurile, lățimea ușilor sau dacă traseul este liber. Pentru scaun rulant, folosește această rută ca plan de orientare și cere confirmarea personalului înainte de deplasare.</p>}
     {route && !accessibilityUnconfirmed && profile === 'wheelchair' && <p className="route-safe" role="status">Datele planului marchează acest traseu fără trepte. Confirmă condițiile la fața locului.</p>}
     {startId && activeDestination && startId === activeDestination && <p className="route-info" role="status">Plecare și destinație identice. Alege două puncte diferite.</p>}
@@ -333,25 +362,30 @@ function GuidancePage({ desk, profile, profileLabel, startId, destinationId, set
 
     {route && currentRouteStep && <section className="route-current-step" aria-live="polite" aria-atomic="true">
       <span>{currentRouteStep.action === 'arrive' ? 'AI AJUNS' : `PASUL ${currentStepIndex + 1} DIN ${route.steps.length}`}</span>
+      {instructionFloorName && <small>{instructionFloorName}{currentRouteStep.toFloor ? ` → ${building.floors.find(item => item.id === currentRouteStep.toFloor)?.name}` : ''}</small>}
       <strong>{currentRouteStep.text}</strong>
-      <small>Urmează linia albastră. Harta ține direcția următoare în sus; punctul albastru se mută când confirmi că ai ajuns la reper.</small>
+      <small>Urmează traseul marcat; punctul albastru se mută când confirmi că ai ajuns la reper. Previzualizările neverificate sunt desenate punctat.</small>
       <div>
         <button type="button" className="secondary" onClick={() => speak(currentRouteStep.text)}>Repetă indicația</button>
-        <button type="button" className="primary" disabled={currentStepIndex >= route.steps.length - 1} onClick={() => { const next = Math.min(currentStepIndex + 1, route.steps.length - 1); setCurrentStep(next); speak(route.steps[next].text); }}>Am ajuns la reper <Icon name="arrow" size={15} /></button>
+        <button type="button" className="primary" disabled={currentStepIndex >= route.steps.length - 1} onClick={() => { const next = Math.min(currentStepIndex + 1, route.steps.length - 1); if (currentRouteStep.toFloor) setVisibleFloor(currentRouteStep.toFloor === 'airi-ground' ? 1 : 2); setCurrentStep(next); speak(route.steps[next].text); }}>{currentRouteStep.toFloor ? `Am ajuns pe Floor ${currentRouteStep.toFloor === 'airi-ground' ? 1 : 2}` : 'Am ajuns la reper'} <Icon name="arrow" size={15} /></button>
       </div>
     </section>}
 
-    <IndoorMap building={AIRI_GROUND_FLOOR} floorId={floor.id} route={route} currentStepIndex={currentStepIndex} activeNodeId={currentRouteStep?.nodeId} startNodeId={startId || undefined} destinationNodeId={activeDestination || undefined} routeIsPreview={accessibilityUnconfirmed} onNodeSelect={(nodeId) => { if (!startId) setStartId(nodeId); else if (!destinationId) setDestinationId(nodeId); else setDestinationId(nodeId); }} locationLabel={(node) => locations.find((item) => item.node.id === node.id)?.label ?? node.label ?? 'Reper de orientare'} />
+    <div ref={floorControlsRef} className="floor-switcher floor-switcher--map" role="group" aria-label="Alege etajul afișat">
+      <button type="button" className={visibleFloor === 1 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 1} onClick={() => { setVisibleFloor(1); window.speechSynthesis?.cancel(); }}>Floor 1 · Parter</button>
+      <button type="button" className={visibleFloor === 2 ? 'primary' : 'secondary'} aria-pressed={visibleFloor === 2} onClick={() => { setVisibleFloor(2); window.speechSynthesis?.cancel(); }}>Floor 2 · Etajul 1</button>
+    </div>
+    <IndoorMap key={floor.id} building={building} floorId={floor.id} route={route} currentStepIndex={currentStepIndex} activeNodeId={currentRouteStep?.nodeId} startNodeId={startId || undefined} destinationNodeId={activeDestination || undefined} routeIsPreview={accessibilityUnconfirmed || schematic} onNodeSelect={(nodeId) => { if (!startId) setStartId(nodeId); else if (!destinationId) setDestinationId(nodeId); else setDestinationId(nodeId); }} locationLabel={(node) => locations.find((item) => item.node.id === node.id)?.label ?? node.label ?? 'Reper de orientare'} />
 
     {route && <section className="route-guidance" aria-labelledby="route-guidance-heading">
-      <div className="route-guidance__header"><div><span className="eyebrow">TRASEU ÎN PLAN</span><h2 id="route-guidance-heading">{startLabel} → {destinationLabel}</h2><p>{route.steps.length} indicații · {route.totalDistance.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} m între pozițiile scanărilor</p></div>
+      <div className="route-guidance__header"><div><span className="eyebrow">TRASEU ÎN PLAN</span><h2 id="route-guidance-heading">{startLabel} → {destinationLabel}</h2><p>{route.steps.length} indicații · {routeIsSchematic ? 'cel mai scurt traseu pe schema orientativă' : `${route.totalDistance.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} m între pozițiile scanărilor`}</p></div>
       <div className="route-voice-actions"><button type="button" className="secondary" onClick={() => speak(`${accessibilityUnconfirmed ? 'Atenție. Accesibilitatea traseului nu a fost confirmată la fața locului. ' : ''}${route.steps.map((step) => step.text).join('. ')}`)}><Icon name="accessibility" size={16} /> Ascultă traseul</button><button type="button" className="text-button" onClick={() => { window.speechSynthesis?.cancel(); setVoiceStatus('Ghidarea vocală a fost oprită.'); }}>Oprește vocea</button></div>
       </div>
       {voiceStatus && <p className="route-voice-status" role="status">{voiceStatus}</p>}
-      <ol className="route-step-list">{route.steps.map((step, index) => <li key={step.id} className={index === currentStepIndex ? 'is-current' : ''}><span>{index + 1}</span><div><strong>{step.text}</strong>{step.distance !== undefined && <small>{step.distance.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} m între pozițiile scanărilor — nu distanță pietonală măsurată</small>}</div><button type="button" aria-label={`Ascultă pasul ${index + 1}`} onClick={() => { setCurrentStep(index); speak(step.text); }}>Ascultă</button></li>)}</ol>
+      <ol className="route-step-list">{route.steps.map((step, index) => <li key={step.id} className={index === currentStepIndex ? 'is-current' : ''}><span>{index + 1}</span><div><strong>{step.text}</strong>{!routeIsSchematic && step.distance !== undefined && <small>{step.distance.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} m între pozițiile scanărilor — nu distanță pietonală măsurată</small>}</div><button type="button" aria-label={`Ascultă pasul ${index + 1}`} onClick={() => { setCurrentStep(index); speak(step.text); }}>Ascultă</button></li>)}</ol>
     </section>}
 
-    <p className="route-source-note">Sursă: <a href="https://airi.utcluj.ro/about/virtual-tour" target="_blank" rel="noreferrer">turul virtual AIRI</a> · pozițiile urmează modelul Matterport. Reperul albastru este ales sau confirmat manual, nu detectat automat de telefon.</p>
+    <p className="route-source-note">Sursă: <a href="https://airi.utcluj.ro/about/virtual-tour" target="_blank" rel="noreferrer">turul virtual AIRI</a> · {schematic ? 'schemă trasată după fotografiile furnizate, fără coordonate măsurate.' : 'pozițiile urmează modelul Matterport.'} Reperul albastru este ales sau confirmat manual.</p>
     {desk && <button type="button" className="text-button guidance-ticket-link" onClick={goToQueue}><Icon name="ticket" size={16} /> Înapoi la tichet</button>}
   </section>;
 }

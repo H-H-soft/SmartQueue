@@ -17,6 +17,7 @@ export type NodeType =
   | 'stairs'
   | 'ramp'
   | 'desk'
+  | 'room'
   | 'restroom_accessible'
   | 'waiting_area';
 
@@ -28,6 +29,8 @@ export interface Floor {
   width: number;     // dimensiunile planului, în unități ale hărții
   height: number;
   pixelsPerMeter?: number;
+  distanceUnit?: 'meters' | 'schematic';
+  overviewBounds?: { x: number; y: number; width: number; height: number };
   outline?: MapPoint[];
   areas?: MapArea[];
 }
@@ -52,6 +55,9 @@ export interface GraphNode {
   x: number;
   y: number;
   label?: string;
+  markerOffsetY?: number; // Visual offset for the map marker only.
+  markerOffsetX?: number;
+  networkX?: number; // Schematic horizontal position for background connections.
   areaId?: string;
   areaLabel?: string;
   deskId?: string;   // doar pentru type = 'desk'
@@ -60,11 +66,15 @@ export interface GraphNode {
 export type EdgeMode = 'walk' | 'elevator' | 'stairs' | 'ramp';
 
 export interface Edge {
+  hiddenOnMap?: boolean; // Omit from the background network drawing.
+  routingCost?: number; // Optional comparable routing weight; not a measured distance.
+  transitionName?: string;
   from: string;      // id nod
   to: string;        // id nod (muchia e bidirecțională)
   distance: number;  // în metri
   mode: EdgeMode;
   stepFree: boolean | null; // null = necunoscut; true/false trebuie confirmat în clădire
+  wheelchairAllowedByUser?: boolean; // Routing preference, not physical accessibility verification.
   minWidth?: number; // lățimea trecerii, în metri
   slope?: number;    // panta în procente, dacă e cazul
   status?: 'ok' | 'out_of_service'; // ex. lift defect
@@ -101,6 +111,7 @@ export interface RouteStep {
   distance?: number;               // metri, pentru 'walk'
   direction?: 'left' | 'right' | 'straight' | 'back'; // pentru 'turn'
   toFloor?: string;                // pentru 'elevator' / 'stairs' / 'ramp'
+  fromFloor?: string;
   landmark?: string;               // reper util, dacă există
   nodeId: string;                  // nodul în care se termină pasul
   pathNodeIds?: string[];          // segmentul acestui pas, pentru evidențierea pe plan
@@ -112,8 +123,9 @@ export interface Route {
   profile: AccessibilityProfile;
   steps: RouteStep[];
   nodePath: string[];              // lista de noduri parcurse, pentru desenat pe hartă
-  totalDistance: number;           // metri
-  estimatedSeconds: number;
+  totalDistance: number;           // See distanceUnit; schematic totals are routing weights.
+  distanceUnit?: 'meters' | 'schematic';
+  estimatedSeconds?: number;
 }
 
 // ---------- Cozi și tichete ----------

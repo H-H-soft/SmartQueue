@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-labelledby="title desc">
+ <title id="title">Floor 2 · Etajul 1</title>
+ <desc id="desc">Plan schematic după imaginile Matterport. Lifturile sunt lângă scara centrală de piatră. Scara din aripa dreaptă este în spatele ușii indicate de utilizator. Pozițiile sunt aproximative.</desc>
+ <rect width="1000" height="420" fill="#e9efe9"/>
+ <g fill="#fafbf8" stroke="#71877a" stroke-width="2" stroke-linejoin="round">
+  <path fill-rule="evenodd" d="M40 150H75V166H170V154H205V174H290V160H320V177H345V109H389V50L416 51L474 117L500 128H552V174L719 194H739V180H765V195H850V185H880V200H965V190H985V335H820V254H720V237H430V309H350V236H302V264H275V231H205V303H40ZM75 195V275H170V196ZM855 228V306H950V229Z"/>
+  <path d="M351 116H388V203H351Z" fill="#dce3de"/>
+  <path d="M361 137H379V178H361Z" fill="#8c9d92"/>
+  <path d="M475 130H550V188H475Z" fill="#e1c59c"/>
+ </g>
+ <g stroke="#9aa99e" stroke-width="2"><path d="M352 124H387M352 130H387M352 184H387M352 191H387M352 198H387"/><path d="M480 140H547M480 150H547M480 160H547M480 170H547M480 180H547"/></g>
+</svg>

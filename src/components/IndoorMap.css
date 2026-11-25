@@ -87,11 +87,11 @@
 .indoor-map__canvas { fill: #e9efe9; }
 .indoor-map__grid { opacity: .43; pointer-events: none; }
 .indoor-map__grid-dot { fill: #a8b8ac; }
-.indoor-map__plan { opacity: .48; pointer-events: none; }
+.indoor-map__plan { opacity: 1; pointer-events: none; }
 
 .indoor-map__network line {
-  stroke: #bdd2c2;
-  stroke-width: 14;
+  stroke: #b2c5ba;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -112,6 +112,17 @@
   stroke-width: 2.5;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 2px 3px #18382a48);
+}
+.indoor-map__room-label,
+.indoor-map__room-label tspan {
+  fill: #000 !important;
+  --darkreader-inline-fill: #000 !important;
+  color-scheme: light;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  stroke: none;
+  pointer-events: none;
 }
 .indoor-map__landmark-number {
   fill: #fff;
@@ -135,11 +146,10 @@
   vector-effect: non-scaling-stroke;
   pointer-events: none;
 }
-.indoor-map__route-underlay { stroke: #fff; stroke-width: 16; }
-.indoor-map__route-line { stroke: #087fbe; stroke-width: 8; filter: drop-shadow(0 1px 3px #14445e40); }
+.indoor-map__route-underlay { stroke: #fff; stroke-width: 6; stroke-opacity: .85; }
+.indoor-map__route-line { stroke: #087fbe; stroke-width: 3; }
 .indoor-map__route-line.is-preview { stroke: #a46512; stroke-dasharray: 6 5; }
-.indoor-map__route-current { stroke: #f1b82e; stroke-width: 13; filter: drop-shadow(0 0 3px #fff); }
-.indoor-map__arrow { fill: #087fbe; stroke: #fff; stroke-width: 1.5; }
+.indoor-map__route-current { stroke: #d99a12; stroke-width: 4; }
 
 .indoor-map__turn-marker circle { fill: #f8c643; stroke: #fff; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .indoor-map__turn-marker text { fill: #29351b; font-family: inherit; font-size: 9px; font-weight: 900; }
@@ -218,9 +228,9 @@
 .map-legend small { flex-basis: 100%; color: #748178; font-size: .64rem; line-height: 1.45; }
 .map-legend__swatch { display: inline-block; width: 25px; height: 0; border-top: 4px solid; border-radius: 2px; }
 .map-legend__swatch--network { border-color: #a9c3af; border-top-width: 8px; }
-.map-legend__swatch--route { border-color: #087fbe; border-top-width: 6px; }
+.map-legend__swatch--route { border-color: #087fbe; border-top-width: 3px; }
 .map-legend__swatch--route.is-preview { border-color: #a46512; border-top-style: dashed; }
-.map-legend__swatch--current { border-color: #f1b82e; border-top-width: 6px; }
+.map-legend__swatch--current { border-color: #d99a12; border-top-width: 4px; }
 .map-legend__pin { display: inline-grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; color: #fff; font-style: normal; font-size: .58rem; font-weight: 900; }
 .map-legend__pin--start { background: #1c734b; }
 .map-legend__pin--destination { background: #bf493e; }
@@ -288,37 +298,7 @@
   .indoor-map__landmark-number,.indoor-map__pin text { fill: HighlightText; }
   .indoor-map__scale text { fill: CanvasText; stroke: Canvas; }
   .map-places__item { color: CanvasText; background: Canvas; border-color: CanvasText; }
-.map-panel { margin: 17px 0 0; padding: 12px; border: 1px solid #e4eae3; border-radius: 13px; background: #fcfdfb; color: #24372e; }
-.map-panel__heading { display: flex; align-items: center; justify-content: space-between; }
-.map-panel__heading h3 { margin: 0 0 3px; color: #35493d; font-size: .83rem; }
-.map-panel__heading p { margin: 0 0 10px; color: #839087; font-size: .68rem; }
-.map-scroll { width: 100%; overflow: auto; border: 1px solid #e7ece6; border-radius: 9px; background-color: #f7f9f6; background-image: radial-gradient(#dfe7df 1px,transparent 1px); background-size: 16px 16px; overscroll-behavior-inline: contain; }
-.indoor-map { display: block; width: 100%; min-width: 520px; height: auto; }
-.indoor-map__background { fill: #f8faf7; fill-opacity: .88; stroke: #dce5db; stroke-width: 2; }
-.indoor-map__corridor { stroke: #bdcbbf; stroke-width: 22; stroke-linecap: round; }
-.indoor-map__corridor--closed { stroke: #bf6e5c; stroke-dasharray: 5 10; }
-.indoor-map__route { stroke: #188164; stroke-width: 8; stroke-linecap: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 1px 1px #ffffff); }
-.indoor-map__node { fill: #fff; stroke: #78917e; stroke-width: 2; }
-.indoor-map__node--start { fill: #e1b152; stroke: #8c6623; }
-.indoor-map__node--destination { fill: #188164; stroke: #0e6049; }
-.indoor-map__active-ring { fill: none; stroke: #bd8424; stroke-width: 4; }
-.indoor-map__empty { fill: #77857b; font-family: inherit; font-size: 20px; font-weight: 650; }
-.indoor-map__label,.indoor-map__endpoint { fill: #304239; font-family: inherit; font-size: 12px; font-weight: 700; }
-.indoor-map__label { stroke: #f8faf7; stroke-width: 4; paint-order: stroke; }
-.indoor-map__endpoint { fill: #fff; stroke: #315746; stroke-width: 3px; paint-order: stroke; font-size: 10px; }
-.map-legend { display: flex; flex-wrap: wrap; gap: 8px 17px; padding: 0; margin: 11px 0 0; list-style: none; color: #758179; font-size: .64rem; }
-.map-legend li { display: flex; align-items: center; gap: 7px; }
-.map-legend__swatch { display: inline-block; width: 20px; height: 0; border-top: 4px solid; }
-.map-legend__swatch--route { border-color: #188164; }
-.map-legend__swatch--corridor { border-color: #bdcbbf; }
-.map-legend__swatch--closed { border-color: #bf6e5c; border-top-style: dotted; }
-@media (max-width: 600px) { .map-panel { padding: 9px; } .indoor-map { min-width: 490px; } }
-@media (forced-colors: active) {
-  .indoor-map__background { fill: Canvas; stroke: CanvasText; }
-  .indoor-map__route { stroke: Highlight; }
-  .indoor-map__corridor { stroke: GrayText; }
-  .indoor-map__node,.indoor-map__node--start,.indoor-map__node--destination { fill: Canvas; stroke: CanvasText; }
-  .indoor-map__label,.indoor-map__endpoint { fill: CanvasText; stroke: Canvas; }
-  .indoor-map__active-ring { fill: none; stroke: Highlight; }
-  .indoor-map__empty { fill: CanvasText; }
 }
+
+.map-zoom { flex-wrap: wrap; }
+.map-zoom button[aria-pressed="true"] { background: #dcefe4; color: #12472f; }

@@ -31,11 +31,14 @@ export function edgeCost(edge: Edge, profile: AccessibilityProfile): number | nu
   if (profile === 'wheelchair') {
     // Unknown geometry is not safe to advertise as a step-free route.
     if (edge.stepFree !== true || edge.mode === 'stairs') return null;
+    // User-enabled corridors remain unverified; never override known barriers or stairs.
+    if (edge.mode === 'stairs' || edge.stepFree === false) return null;
+    if (edge.stepFree !== true && !(['walk', 'elevator'].includes(edge.mode) && edge.wheelchairAllowedByUser)) return null;
     if (edge.minWidth !== undefined && edge.minWidth < WHEELCHAIR_MIN_WIDTH) return null;
     if (edge.slope !== undefined && edge.slope > WHEELCHAIR_MAX_SLOPE) return null;
   }
 
-  let cost = edge.distance;
+  let cost = edge.routingCost ?? edge.distance;
   if (profile === 'reduced' && edge.mode === 'stairs') cost *= 5; // scările sunt obositoare
   if (profile === 'visual' && edge.mode === 'stairs') cost *= 2;  // preferăm liftul
   return cost;
@@ -192,7 +195,7 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
     const endText = until === 'turn'
       ? `până la ${endNode?.label ?? `virajul ${nextTurnNumber} marcat pe plan`}`
       : until === 'transition'
-        ? 'până la următoarea schimbare de nivel'
+        ? `până la ${endNode?.label ?? 'următoarea schimbare de nivel'}`
         : `până la ${endNode?.label ?? 'destinația selectată'}`;
     steps.push({
       id: nextId++,
@@ -228,11 +231,12 @@ function buildSteps(building: Building, nodePath: string[], edges: Edge[]): Rout
         action,
         text:
           action === 'elevator'
-            ? `Ia ${a.label ?? 'liftul'} până la ${floorName}`
+            ? `Folosește ${edge.transitionName ?? 'liftul'} până la ${floorName}`
             : action === 'stairs'
-              ? `Folosește scările până la ${floorName}`
+              ? `Folosește ${edge.transitionName ?? 'scările'} până la ${floorName}`
               : `Folosește rampa până la ${floorName}`,
         toFloor: b.floor,
+        fromFloor: a.floor,
         nodeId: b.id,
       });
       walkNodeIds = [b.id];
@@ -290,14 +294,25 @@ export function findRoute(
   const known = new Set(building.nodes.map((n) => n.id));
   if (!known.has(fromId) || !known.has(toId)) return null;
 
-  const adj = getAdjacency(building, profile);
+  const allAdj = getAdjacency(building, profile);
+  const nodesById = new Map(building.nodes.map(n => [n.id, n]));
+  const originFloor = nodesById.get(fromId)!.floor;
+  const targetFloor = nodesById.get(toId)!.floor;
+  // Keep same-floor routes on that floor. Between these two floors, cross only
+  // toward the destination; never use another floor as a corridor shortcut.
+  const adj = new Map([...allAdj].map(([id, neighbors]) => [id, neighbors.filter(n => {
+    const a = nodesById.get(id)!.floor, b = nodesById.get(n.to)!.floor;
+    if (originFloor === targetFloor) return a === originFloor && b === originFloor;
+    return a === b || (a === originFloor && b === targetFloor);
+  })]));
   const result = dijkstra(adj, fromId, toId);
   if (!result) return null;
 
   const { nodePath, edges } = result;
-  const totalDistance = edges.reduce((sum, e) => sum + e.distance, 0);
+  const schematic = originFloor !== targetFloor || nodePath.some(id => building.floors.find(f => f.id === nodesById.get(id)!.floor)?.distanceUnit === 'schematic');
+  const totalDistance = edges.reduce((sum, e) => sum + (schematic ? e.routingCost ?? e.distance : e.distance), 0);
   const verticalMoves = edges.filter((e) => e.mode === 'elevator' || e.mode === 'stairs').length;
-  const estimatedSeconds = Math.round(
+  const estimatedSeconds = schematic ? undefined : Math.round(
     totalDistance / SPEED[profile] + verticalMoves * VERTICAL_TRANSITION_SECONDS,
   );
 
@@ -308,6 +323,7 @@ export function findRoute(
     steps: buildSteps(building, nodePath, edges),
     nodePath,
     totalDistance,
+    distanceUnit: schematic ? 'schematic' : 'meters',
     estimatedSeconds,
   };
 }
