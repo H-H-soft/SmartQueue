@@ -9,7 +9,6 @@
     "floorAreaSquareMeters": 2605,
     "scanDate": "2026-11-15",
     "accessibilityVerified": false,
-    "note": "Planul pereților este extras din geometria 3D a turului la înălțimea de 1,2 m. Pozițiile sunt coordonatele scanărilor Matterport. Traseele folosesc legături de navigare existente în tur; lungimea fiecărui segment este distanța geometrică dintre două scanări. Accesul fără trepte, lățimea ușilor și orientarea utilizatorului nu au fost confirmate la fața locului."
     "note": "Planul pereților este extras din geometria 3D a turului la înălțimea de 1,2 m. Pozițiile sunt coordonatele scanărilor Matterport. Traseele folosesc legături de navigare existente în tur; lungimea fiecărui segment este distanța geometrică dintre două scanări. Accesul fără trepte, lățimea ușilor și orientarea utilizatorului nu au fost confirmate la fața locului.",
     "overviewNote": "Schematic overview based on the supplied Matterport screenshot, not surveyed geometry. Original landmark coordinates are preserved. Links scan-23 to scan-25 and scan-33 to scan-179 were removed because they intersect scan outlines. Destination names and physical access remain unverified.",
     "wheelchairRoutingNote": "All mapped walking corridors enabled at user request. Physical accessibility remains unverified; stepFree values are unchanged."
@@ -22,7 +21,6 @@
       "plan": "/maps/airi-ground-overview.svg",
       "width": 1000,
       "height": 800,
-      "pixelsPerMeter": 10
       "pixelsPerMeter": 10,
       "overviewBounds": {
         "x": 100,
@@ -433,7 +431,6 @@
       "to": "scan-25",
       "distance": 6.91,
       "mode": "walk",
-      "stepFree": null
       "stepFree": null,
       "wheelchairAllowedByUser": true
     },
@@ -523,7 +520,6 @@
       "to": "scan-29",
       "distance": 4.55,
       "mode": "walk",
-      "stepFree": null
       "stepFree": null,
       "wheelchairAllowedByUser": true
     },
@@ -603,7 +599,6 @@
       "to": "scan-179",
       "distance": 6.19,
       "mode": "walk",
-      "stepFree": null
       "stepFree": null,
       "wheelchairAllowedByUser": true
     },

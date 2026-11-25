@@ -11,7 +11,6 @@ import IndoorMap from './components/IndoorMap';
 import airiGroundFloor from './data/airi-ground-floor.json';
 import { floorTwoBuilding } from './data/airi-floor-2';
 import { connectAiriFloors } from './data/connect-floors';
-import { findRoute } from './routing/findRoute';
 import './App.css';
 
 type AppView = 'home' | 'queue' | 'guidance' | 'accessibility' | 'staff' | 'account';

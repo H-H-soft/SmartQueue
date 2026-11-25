@@ -29,8 +29,6 @@ export function edgeCost(edge: Edge, profile: AccessibilityProfile): number | nu
   if (edge.status === 'out_of_service') return null;
 
   if (profile === 'wheelchair') {
-    // Unknown geometry is not safe to advertise as a step-free route.
-    if (edge.stepFree !== true || edge.mode === 'stairs') return null;
     // User-enabled corridors remain unverified; never override known barriers or stairs.
     if (edge.mode === 'stairs' || edge.stepFree === false) return null;
     if (edge.stepFree !== true && !(['walk', 'elevator'].includes(edge.mode) && edge.wheelchairAllowedByUser)) return null;
