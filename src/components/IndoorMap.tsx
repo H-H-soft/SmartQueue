@@ -114,14 +114,14 @@ function pointsBounds(nodes: GraphNode[]) {
   };
 }
 
-function routeCamera(bounds: ReturnType<typeof pointsBounds>, routeNodes: GraphNode[], position: GraphNode | undefined, zoom: number) {
+function routeCamera(bounds: ReturnType<typeof pointsBounds>, routeNodes: GraphNode[], position: GraphNode | undefined, zoom: number, overviewRotation = 0) {
   const centerX = bounds.x + bounds.width / 2;
   const centerY = bounds.y + bounds.height / 2;
   if (!position || routeNodes.length < 2) {
     return {
-      rotation: 0,
+      rotation: overviewRotation,
       zoom,
-      transform: `translate(${centerX * (1 - zoom)} ${centerY * (1 - zoom)}) scale(${zoom})`,
+      transform: `translate(${centerX} ${centerY}) scale(${zoom}) rotate(${overviewRotation}) translate(${-centerX} ${-centerY})`,
     };
   }
 
@@ -129,9 +129,9 @@ function routeCamera(bounds: ReturnType<typeof pointsBounds>, routeNodes: GraphN
   const next = positionIndex >= 0 ? routeNodes[positionIndex + 1] : undefined;
   if (!next) {
     return {
-      rotation: 0,
+      rotation: overviewRotation,
       zoom,
-      transform: `translate(${centerX * (1 - zoom)} ${centerY * (1 - zoom)}) scale(${zoom})`,
+      transform: `translate(${centerX} ${centerY}) scale(${zoom}) rotate(${overviewRotation}) translate(${-centerX} ${-centerY})`,
     };
   }
 
@@ -218,7 +218,7 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
     ? route?.steps[Math.min(currentStepIndex - 1, (route?.steps.length ?? 1) - 1)]?.nodeId
     : startNodeId ?? activeNodeId;
   const userPosition = nodesById.get(lastConfirmedId ?? '');
-  const camera = routeCamera(bounds, followDirection ? routeNodes : [], userPosition, zoom);
+  const camera = routeCamera(bounds, followDirection ? routeNodes : [], userPosition, zoom, 180);
   const userPositionIndex = userPosition ? routeNodes.findIndex((node) => node.id === userPosition.id) : -1;
   const userNextNode = userPositionIndex >= 0 ? routeNodes[userPositionIndex + 1] : undefined;
   const userDirection = userNextNode
@@ -238,7 +238,7 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
         <div>
           <span className="map-panel__kicker">HARTĂ INTERIOARĂ · {floor.name}</span>
           <h3>{floor.name}</h3>
-          <p>{followDirection && route ? 'Harta se rotește în direcția următorului segment.' : 'Vedere de ansamblu în orientarea fotografiei Matterport. Alege plecarea și destinația.'}</p>
+          <p>{followDirection && route ? 'Harta se rotește în direcția următorului segment.' : 'Vedere de ansamblu. Alege plecarea și destinația.'}</p>
         </div>
         <div className="map-zoom" role="group" aria-label="Mărire hartă">
           <button type="button" onClick={() => setZoom((value) => Math.min(MAX_ZOOM, value + ZOOM_STEP))} aria-label="Mărește harta">+</button>
@@ -273,6 +273,7 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
           <g transform={camera.transform}>
             <image className="indoor-map__plan" href={floor.plan} x="0" y="0" width={floor.width} height={floor.height} preserveAspectRatio="none" />
 
+            {floorId === 'airi-ground' && <text x="347" y="533" fontSize="9" textAnchor="middle" fill="#536958" transform={`rotate(${-camera.rotation} 347 533)`}>Scări de lemn</text>}
             <g className="indoor-map__network" aria-hidden="true">
               {mapEdges.map((edge) => {
                 const from = nodesById.get(edge.from)!;
@@ -311,20 +312,20 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
                 <title>{`${number}. ${label}`}</title>
                 <circle className="indoor-map__landmark-hit" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r="19" />
                 <circle className="indoor-map__landmark-dot" cx={markerX} cy={node.y + (node.markerOffsetY ?? 0)} r={routeNodes.some(routeNode => routeNode.id === node.id) ? 12 : selected ? 11 : 9} />
-                <text className="indoor-map__landmark-number" x={markerX} y={node.y + (node.markerOffsetY ?? 0) + 4} textAnchor="middle">{number}</text>
+                <text className="indoor-map__landmark-number" transform={`rotate(${-camera.rotation} ${markerX} ${node.y + (node.markerOffsetY ?? 0)})`} x={markerX} y={node.y + (node.markerOffsetY ?? 0) + 4} textAnchor="middle">{number}</text>
               </g>;
             })}
 
             {turns.map((turn) => turn.node && (
               <g key={turn.id} className={`indoor-map__turn-marker${turn.active ? ' is-current' : ''}`} transform={`translate(${turn.node.x} ${turn.node.y})`}>
                 <circle r="12" />
-                <text y="4" textAnchor="middle">{turn.number}</text>
+                <text transform={`rotate(${-camera.rotation})`} y="4" textAnchor="middle">{turn.number}</text>
               </g>
             ))}
 
             {destination && destination.floor === floorId && <g className="indoor-map__pin indoor-map__pin--destination" transform={`translate(${destination.x} ${destination.y})`} filter={`url(#${titleId}-shadow)`}>
               <circle r="16" />
-              <text y="5" textAnchor="middle">D</text>
+              <text transform={`rotate(${-camera.rotation})`} y="5" textAnchor="middle">D</text>
             </g>}
 
             {userPosition?.floor === floorId && <g className={`indoor-map__you${route && userNextNode ? ' is-following' : ''}`} transform={`translate(${userPosition.x} ${userPosition.y})`} filter={`url(#${titleId}-shadow)`}>
@@ -350,7 +351,7 @@ export default function IndoorMap({ building, floorId, route, activeNodeId, star
               const x = node.x;
               const above = upperDoor || node.id === 'scan-11';
               const y = node.y + (above ? -16 - (lines.length - 1) * 11 : 24);
-              return <text key={`room-label-${node.id}`} className="indoor-map__room-label" x={x} y={y} textAnchor="middle">
+              return <text key={`room-label-${node.id}`} className="indoor-map__room-label" transform={`rotate(${-camera.rotation} ${x} ${y})`} x={x} y={y} textAnchor="middle">
                 {lines.map((line, index) => <tspan key={index} x={x} dy={index ? 11 : 0}>{line}</tspan>)}
               </text>;
             })}

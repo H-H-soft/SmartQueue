@@ -4,7 +4,7 @@ import type { Building, Edge, GraphNode } from '../types';
 export function connectAiriFloors(ground: Building, upper: Building): Building {
   const approaches: GraphNode[] = [
     { id: 'g-stone-stairs', floor: 'airi-ground', type: 'stairs', x: 289.7, y: 540, markerOffsetX: -19.7, label: 'Scara de piatră · parter' },
-    { id: 'g-wing-stairs', floor: 'airi-ground', type: 'stairs', x: 565, y: 614, label: 'Scară închisă · aripa dreaptă' },
+    { id: 'g-wing-stairs', floor: 'airi-ground', type: 'stairs', x: 565, y: 614, label: 'Aripa stângă' },
   ];
   const atriumStairs = ground.nodes.filter(n => n.id === 'g-atrium-stairs');
   // Keep existing landmark numbers; the new ground-floor stairs are point 12.
@@ -18,7 +18,7 @@ export function connectAiriFloors(ground: Building, upper: Building): Building {
     { from: 'scan-26', to: 'f2-lifts', mode: 'elevator', distance: 0, routingCost: 80, stepFree: null, wheelchairAllowedByUser: true, transitionName: 'lifturile centrale' },
     { from: 'g-stone-stairs', to: 'f2-stone-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara de piatră' },
     { from: 'g-atrium-stairs', to: 'f2-atrium-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara de lemn a atriumului' },
-    { from: 'g-wing-stairs', to: 'f2-enclosed-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara închisă din aripa dreaptă' },
+    { from: 'g-wing-stairs', to: 'f2-enclosed-stairs', mode: 'stairs', distance: 0, routingCost: 60, stepFree: false, transitionName: 'scara închisă din aripa stângă' },
   ];
   // Compare both plans in approximate common drawing units. This is a routing
   // weight only: ground distances remain meters; upper coordinates are schematic.

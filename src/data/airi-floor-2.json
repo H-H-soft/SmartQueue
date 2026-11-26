@@ -63,7 +63,7 @@
       "floor": "airi-floor-2",
       "x": 390,
       "y": 283,
-      "label": "Hol central · capăt sud",
+      "label": "Capăt",
       "type": "junction"
     },
     {
@@ -85,7 +85,7 @@
       "floor": "airi-floor-2",
       "x": 285,
       "y": 205,
-      "label": "Aripa stângă · acces",
+      "label": "Aripa dreaptă",
       "type": "junction"
     },
     {
@@ -158,7 +158,7 @@
       "floor": "airi-floor-2",
       "x": 916,
       "y": 223,
-      "label": "Ușă scară închisă · aripa dreaptă",
+      "label": "Aripa stângă",
       "type": "stairs"
     },
     {
@@ -559,11 +559,11 @@
     },
     {
       "nodeId": "f2-hall-south",
-      "text": "Hol central · capăt sud"
+      "text": "Capăt"
     },
     {
       "nodeId": "f2-west-entry",
-      "text": "Aripa stângă · acces"
+      "text": "Aripa dreaptă"
     },
     {
       "nodeId": "f2-west-sw",
@@ -575,7 +575,7 @@
     },
     {
       "nodeId": "f2-enclosed-stairs",
-      "text": "Ușă scară închisă · aripa dreaptă"
+      "text": "Aripa stângă"
     },
     {
       "nodeId": "f2-room-s108",

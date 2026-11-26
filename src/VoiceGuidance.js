@@ -310,7 +310,7 @@
     'scan-22': ['iesire', 'exit'],
     'scan-23': ['turnicheti', 'turnichet', 'porti de acces'],
     'scan-24': ['receptie', 'tejghea'],
-    'scan-26': ['lift', 'ascensor'],
+    'scan-26': ['aripa dreapta'],
     'scan-178': ['camera 105', '105'],
   };
   let pendingRouteDestination = null;
